@@ -2603,6 +2603,7 @@ let Player_CurrentDirection = 0
 let Player_CurrentState = 0
 let Player_Sprite_MoveController: Sprite = null
 let Setting_Sound_EffectsVolume = 0
+Settings_Sound()
 if (blockSettings.exists("ControlScheme")) {
     Game_SetControls(blockSettings.readNumber("ControlScheme"))
     WhiskyjackIntro()
