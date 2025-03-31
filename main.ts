@@ -404,6 +404,54 @@ function WhiskyjackIntro () {
         })
     })
 }
+function Interact_ControlControlsMenu2 () {
+    Menu_ChangeControls.moveSelection(miniMenu.MoveDirection.Down)
+    Menu_ChangeControls.moveSelection(miniMenu.MoveDirection.Down)
+    Menu_Sprite_PlayerControlsScheme.setImage(assets.image`Menu_ControlsScheme_1`)
+    Menu_Sprite_Selector.y += 28
+    Menu_ChangeControls.onButtonPressed(controller.A, function (selection, selectedIndex) {
+        Menu_ChangeControls.close()
+        sprites.destroy(Menu_Sprite_PlayerControlsMenu)
+        sprites.destroy(Menu_Sprite_PlayerControlsScheme)
+        sprites.destroy(Menu_Sprite_Selector)
+        Play_Menu_Select()
+        Game_SetControls(selectedIndex)
+        pause(100)
+        WhiskyjackIntro()
+    })
+    Menu_ChangeControls.onButtonPressed(controller.up, function (selection, selectedIndex) {
+        if (selectedIndex > 0) {
+            Menu_ChangeControls.moveSelection(miniMenu.MoveDirection.Up)
+            Menu_Sprite_Selector.y += -14
+            Play_Menu_Change()
+            if (selectedIndex == 3) {
+                Menu_Sprite_PlayerControlsScheme.setImage(assets.image`Menu_ControlsScheme_1`)
+            } else if (selectedIndex == 2) {
+                Menu_Sprite_PlayerControlsScheme.setImage(assets.image`Menu_ControlsScheme_4`)
+            } else if (selectedIndex == 4) {
+                Menu_Sprite_PlayerControlsScheme.setImage(assets.image`Menu_ControlsScheme_2`)
+            } else {
+                Menu_Sprite_PlayerControlsScheme.setImage(assets.image`Menu_ControlsScheme_5`)
+            }
+        }
+    })
+    Menu_ChangeControls.onButtonPressed(controller.down, function (selection, selectedIndex) {
+        if (selectedIndex < 4) {
+            Menu_ChangeControls.moveSelection(miniMenu.MoveDirection.Down)
+            Menu_Sprite_Selector.y += 14
+            Play_Menu_Change()
+            if (selectedIndex == 2) {
+                Menu_Sprite_PlayerControlsScheme.setImage(assets.image`Menu_ControlsScheme_2`)
+            } else if (selectedIndex == 1) {
+                Menu_Sprite_PlayerControlsScheme.setImage(assets.image`Menu_ControlsScheme_1`)
+            } else if (selectedIndex == 3) {
+                Menu_Sprite_PlayerControlsScheme.setImage(assets.image`Menu_ControlsScheme_3`)
+            } else {
+                Menu_Sprite_PlayerControlsScheme.setImage(assets.image`Menu_ControlsScheme_4`)
+            }
+        }
+    })
+}
 function Settings_Enemies () {
     Setting_Enemy_SpawnVerticalOffset = 80
     Setting_Enemy_SpawnHorizontalOffset = 100
@@ -1050,12 +1098,6 @@ function Game_Brightness25 () {
     color.setColor(15, color.rgb(0, 0, 0))
 }
 function Game_LoadSave () {
-    if (blockSettings.exists("ControlScheme")) {
-        Game_SetControls(blockSettings.readNumber("ControlScheme"))
-    } else {
-        Game_SetControls(0)
-        blockSettings.writeNumber("ControlScheme", 0)
-    }
     if (blockSettings.exists("PlayerBody")) {
         if (blockSettings.readNumber("PlayerBody") == 0) {
             Player_isMale = true
@@ -2198,6 +2240,42 @@ function Player_CreateMoveController () {
     Player_Sprite_PickupBox.setFlag(SpriteFlag.StayInScreen, false)
     Player_Sprite_PickupBox.setFlag(SpriteFlag.Invisible, true)
 }
+function Interact_ChangeControlsMenu2 () {
+    Player_isLocked = true
+    Play_Menu_Open()
+    Menu_Sprite_Selector = sprites.create(assets.image`Menu_Selector`, SpriteKind.Player)
+    Menu_Sprite_Selector.setFlag(SpriteFlag.RelativeToCamera, true)
+    Menu_Sprite_Selector.z = Setting_UI_InterfaceZ + 120
+    Menu_Sprite_Selector.setPosition(14, 30)
+    Menu_Sprite_PlayerControlsMenu = sprites.create(assets.image`Menu_SetControlsBackground_0`, SpriteKind.Player)
+    Menu_Sprite_PlayerControlsMenu.setFlag(SpriteFlag.RelativeToCamera, true)
+    Menu_Sprite_PlayerControlsMenu.z = Setting_UI_InterfaceZ + 90
+    Menu_Sprite_PlayerControlsScheme = sprites.create(assets.image`Menu_ControlsScheme_1`, SpriteKind.Player)
+    Menu_Sprite_PlayerControlsScheme.setFlag(SpriteFlag.RelativeToCamera, true)
+    Menu_Sprite_PlayerControlsScheme.z = Setting_UI_InterfaceZ + 100
+    Menu_Sprite_PlayerControlsScheme.x += 8
+    Menu_ChangeControls = miniMenu.createMenu(
+    miniMenu.createMenuItem("x/z"),
+    miniMenu.createMenuItem("z/x"),
+    miniMenu.createMenuItem("Space"),
+    miniMenu.createMenuItem("J/k"),
+    miniMenu.createMenuItem("K/J")
+    )
+    Menu_ChangeControls.setButtonEventsEnabled(true)
+    Menu_ChangeControls.setStyleProperty(miniMenu.StyleKind.DefaultAndSelected, miniMenu.StyleProperty.IconOnly, 0)
+    Menu_ChangeControls.setStyleProperty(miniMenu.StyleKind.DefaultAndSelected, miniMenu.StyleProperty.Background, 0)
+    Menu_ChangeControls.setStyleProperty(miniMenu.StyleKind.DefaultAndSelected, miniMenu.StyleProperty.BorderColor, 0)
+    Menu_ChangeControls.setStyleProperty(miniMenu.StyleKind.DefaultAndSelected, miniMenu.StyleProperty.Padding, 0)
+    Menu_ChangeControls.setStyleProperty(miniMenu.StyleKind.DefaultAndSelected, miniMenu.StyleProperty.Padding, 3)
+    Menu_ChangeControls.setMenuStyleProperty(miniMenu.MenuStyleProperty.Columns, 1)
+    Menu_ChangeControls.setMenuStyleProperty(miniMenu.MenuStyleProperty.Rows, 5)
+    Menu_ChangeControls.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Foreground, 9)
+    Menu_ChangeControls.setStyleProperty(miniMenu.StyleKind.Default, miniMenu.StyleProperty.Foreground, 8)
+    Menu_ChangeControls.setFlag(SpriteFlag.RelativeToCamera, true)
+    Menu_ChangeControls.setPosition(36, 58)
+    Menu_ChangeControls.z = Setting_UI_InterfaceZ + 110
+    Interact_ControlControlsMenu2()
+}
 function Play_Teleport () {
     timer.background(function () {
         music.stopAllSounds()
@@ -2437,10 +2515,6 @@ let Effect_Level_PlayerTeleportFront: SpreadEffectData = null
 let Effect_Level_PlayerTeleport: SpreadEffectData = null
 let Player_CameraOffsetY = 0
 let Player_CameraOffsetX = 0
-let Menu_ChangeControls: miniMenu.MenuSprite = null
-let Menu_Sprite_PlayerControlsScheme: Sprite = null
-let Menu_Sprite_PlayerControlsMenu: Sprite = null
-let Menu_Sprite_Selector: Sprite = null
 let Menu_PlayerChange: miniMenu.MenuSprite = null
 let _WhatDistance = 0
 let _WhoisClosest = 0
@@ -2482,6 +2556,10 @@ let Setting_Enemy_SlimeJumpDelay = 0
 let Setting_Enemy_DespawnOffset = 0
 let Setting_Enemy_SpawnHorizontalOffset = 0
 let Setting_Enemy_SpawnVerticalOffset = 0
+let Menu_Sprite_PlayerControlsMenu: Sprite = null
+let Menu_Sprite_Selector: Sprite = null
+let Menu_Sprite_PlayerControlsScheme: Sprite = null
+let Menu_ChangeControls: miniMenu.MenuSprite = null
 let Intro_Logo2: Sprite = null
 let Intro_Logo: Sprite = null
 let Intro_Bird: Sprite = null
@@ -2525,7 +2603,12 @@ let Player_CurrentDirection = 0
 let Player_CurrentState = 0
 let Player_Sprite_MoveController: Sprite = null
 let Setting_Sound_EffectsVolume = 0
-WhiskyjackIntro()
+if (blockSettings.exists("ControlScheme")) {
+    Game_SetControls(blockSettings.readNumber("ControlScheme"))
+    WhiskyjackIntro()
+} else {
+    Interact_ChangeControlsMenu2()
+}
 game.onUpdate(function () {
     if (Game_doesPlayerExist) {
         Player_UpdateJumping()
