@@ -1,5 +1,6 @@
 {
     "name": "Slimes Are Weak to Sci-Fi Laser Guns!!",
+    "version": "1.0.0",
     "description": "",
     "dependencies": {
         "device": "*",
