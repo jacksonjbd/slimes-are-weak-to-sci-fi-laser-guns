@@ -396,7 +396,9 @@ function TitleScreen () {
 }
 function WhiskyjackIntro () {
     Game_FadeFromBlack2(500)
-    music.play(music.createSoundEffect(WaveShape.Triangle, 1, 167, 11, 0, 100, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
+    music.setVolume(75)
+    music.play(music.createSong(assets.song`Jacksong`), music.PlaybackMode.LoopingInBackground)
+    music.setVolume(255)
     Intro_Background = sprites.create(assets.image`Intro_Backdrop`, SpriteKind.Introduction)
     Intro_Background.setPosition(-95, 0)
     Intro_Background.setVelocity(20, 20)
@@ -634,6 +636,9 @@ function Game_StartGame () {
                 Player_isLocked = false
                 Game_isPlaying = true
                 info.startCountdown(180)
+                music.setVolume(75)
+                music.play(music.createSong(assets.song`Jacksong`), music.PlaybackMode.LoopingInBackground)
+                music.setVolume(255)
             })
         })
     })
@@ -1080,6 +1085,7 @@ function Level_ControlsChange () {
     }
 }
 info.onCountdownEnd(function () {
+    music.stopAllSounds()
     game.gameOver(true)
 })
 function Player_UpdateMovement () {
@@ -1226,6 +1232,7 @@ function Game_LoadSave () {
     }
 }
 function Interact_TeleportToGame () {
+    music.stopAllSounds()
     Player_isLocked = true
     Game_isTeleporting = true
     Player_CameraOffsetX = 1
@@ -2028,6 +2035,7 @@ function DamagePlayer (_20: number) {
     } else {
         UI_Sprite_HealthBar.value += -1 * _20
         if (UI_Sprite_HealthBar.value <= 0) {
+            music.stopAllSounds()
             timer.background(function () {
                 pause(500)
                 game.gameOver(false)
