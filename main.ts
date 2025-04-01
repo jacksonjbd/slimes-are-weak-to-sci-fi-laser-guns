@@ -536,7 +536,24 @@ function _3248EnemyCollison (_Enemy1: Sprite, _Enemy2: Sprite, _Amount: number) 
     _Enemy2.y += _Amount * ((_Enemy2.y - _Enemy1.y) / Math_Vector2Magnitude(_Enemy2.x - _Enemy1.x, _Enemy2.y - _Enemy1.y))
 }
 function Pickup_CreateWeapon (_X: number, _Y: number) {
-    Pickup_Sprite_Money = sprites.create(assets.image`Weapon_1`, SpriteKind.WeaponPickup)
+    Pickup_Sprite_Money = sprites.create(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . 3 . . . . . . . 3 . . . . . 
+        . . 3 . . . . . . . 3 . . . . . 
+        . . 3 . . . . . . . 3 . . . . . 
+        . . 3 . . . . . . . 3 . . . . . 
+        . . . 3 . . . . . . 3 . . . . . 
+        . . . 3 . . . . . . 3 . . . . . 
+        . . . 3 . . . . . . . 3 . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . 3 3 . . . . . . . 3 3 3 . . 
+        . . . 3 3 3 3 3 3 3 3 3 . . . . 
+        . . . . . . . . . . . . . . . . 
+        `, SpriteKind.WeaponPickup)
     Pickup_Sprite_Money.lifespan = 10000
     sprites.setDataNumber(Pickup_Sprite_Money, "moneyPoints", 1)
     Pickup_Sprite_Money.setPosition(_X, _Y)
