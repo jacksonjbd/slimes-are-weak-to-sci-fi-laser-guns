@@ -844,7 +844,7 @@ function Settings_Peashooter () {
     Setting_Weapon_Damage_Peashooter = 21
     Setting_Weapon_BulletVelocity_Peashooter = 200
     Setting_Weapon_Firerate_Peashooter = 150
-    Setting_Weapon_Inaccuracy_Peashooter = 20
+    Setting_Weapon_Inaccuracy_Peashooter = 30
 }
 function Game_FadeFromBlack (_Time: number) {
     timer.background(function () {
@@ -1478,7 +1478,7 @@ function Settings_BurstRifle () {
     Setting_Weapon_Damage_Burst = 26
     Setting_Weapon_BulletVelocity_Burst = 200
     Setting_Weapon_Firerate_Burst = 10
-    Setting_Weapon_Inaccuracy_Burst = 30
+    Setting_Weapon_Inaccuracy_Burst = 50
 }
 function Enemy_CreateSlime (_row: number, _col: number) {
     Enemy_Slime = sprites.create(assets.image`Slime_0`, SpriteKind.Slime)
