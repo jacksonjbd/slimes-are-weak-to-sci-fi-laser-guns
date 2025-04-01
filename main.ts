@@ -97,7 +97,7 @@ function Play_Game_Start1 () {
     WaveShape.Sine,
     73.4,
     73.4,
-    255,
+    75,
     0,
     500,
     SoundExpressionEffect.None,
@@ -107,7 +107,7 @@ function Play_Game_Start1 () {
     WaveShape.Sine,
     73.4,
     73.4,
-    255,
+    75,
     0,
     500,
     SoundExpressionEffect.None,
@@ -117,7 +117,7 @@ function Play_Game_Start1 () {
     WaveShape.Triangle,
     293,
     293,
-    255,
+    75,
     0,
     500,
     SoundExpressionEffect.None,
@@ -127,7 +127,7 @@ function Play_Game_Start1 () {
     WaveShape.Sawtooth,
     392,
     392,
-    255,
+    75,
     0,
     500,
     SoundExpressionEffect.None,
@@ -1086,6 +1086,7 @@ function Level_ControlsChange () {
 }
 info.onCountdownEnd(function () {
     music.stopAllSounds()
+    music.setVolume(75)
     game.gameOver(true)
 })
 function Player_UpdateMovement () {
@@ -1536,7 +1537,7 @@ function Play_Game_Start2 () {
     WaveShape.Sine,
     98,
     98,
-    255,
+    75,
     0,
     1000,
     SoundExpressionEffect.None,
@@ -1546,7 +1547,7 @@ function Play_Game_Start2 () {
     WaveShape.Sine,
     146.8,
     146.8,
-    255,
+    75,
     0,
     1000,
     SoundExpressionEffect.None,
@@ -1556,7 +1557,7 @@ function Play_Game_Start2 () {
     WaveShape.Triangle,
     392,
     392,
-    255,
+    75,
     0,
     1000,
     SoundExpressionEffect.None,
@@ -1566,7 +1567,7 @@ function Play_Game_Start2 () {
     WaveShape.Triangle,
     587,
     587,
-    255,
+    75,
     0,
     1000,
     SoundExpressionEffect.None,
@@ -1576,7 +1577,7 @@ function Play_Game_Start2 () {
     WaveShape.Sawtooth,
     783,
     783,
-    255,
+    75,
     0,
     1000,
     SoundExpressionEffect.None,
@@ -2038,6 +2039,7 @@ function DamagePlayer (_20: number) {
             music.stopAllSounds()
             timer.background(function () {
                 pause(500)
+                music.setVolume(75)
                 game.gameOver(false)
             })
         }
