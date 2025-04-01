@@ -403,11 +403,13 @@ function WhiskyjackIntro () {
     Intro_Background.setPosition(-95, 0)
     Intro_Background.setVelocity(20, 20)
     Intro_Bird = sprites.create(assets.image`Intro_Bird_Sleeping`, SpriteKind.Introduction)
-    Intro_Bird.setPosition(45, 38)
+    Intro_Bird.setPosition(45, 36)
     Intro_Logo = sprites.create(assets.image`Intro_Whiskyjack`, SpriteKind.Introduction)
-    Intro_Logo.setPosition(78, 66)
+    Intro_Logo.setPosition(78, 64)
     Intro_Logo2 = sprites.create(assets.image`Intro_Interactive`, SpriteKind.Introduction)
-    Intro_Logo2.setPosition(78, 66)
+    Intro_Logo2.setPosition(78, 64)
+    Intro_Logo2 = sprites.create(assets.image`Intro_Interactive1`, SpriteKind.Introduction)
+    Intro_Logo2.setPosition(78, 83)
     timer.after(2500, function () {
         Game_FadeToBlack2(500)
         timer.after(750, function () {
