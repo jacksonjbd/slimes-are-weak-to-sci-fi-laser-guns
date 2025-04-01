@@ -8,6 +8,7 @@ namespace SpriteKind {
     export const PickupBox = SpriteKind.create()
     export const Introduction = SpriteKind.create()
     export const Potion = SpriteKind.create()
+    export const WeaponPickup = SpriteKind.create()
 }
 /**
  * Sprite Directions 8:
@@ -175,6 +176,11 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
         UI_Sprite_ButtonB.setImage(assets.image`UI_ButtonsFrame3`)
     }
 })
+function Play_WeaponBreak () {
+    music.play(music.createSoundEffect(WaveShape.Sawtooth, 1374, 1286, 36, 0, 200, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
+    music.play(music.createSoundEffect(WaveShape.Noise, 1857, 1506, 142, 0, 100, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
+    scene.cameraShake(4, 200)
+}
 function Game_FadeToBlack (_Time: number) {
     timer.background(function () {
         timer.after(_Time / 5, function () {
@@ -249,6 +255,7 @@ function Level_Unload () {
     sprites.destroyAllSpritesOfKind(SpriteKind.MiniMenu)
     sprites.destroyAllSpritesOfKind(SpriteKind.Introduction)
     sprites.destroyAllSpritesOfKind(SpriteKind.Potion)
+    sprites.destroyAllSpritesOfKind(SpriteKind.WeaponPickup)
     Game_doesPlayerExist = false
 }
 function Weapon_Fire_PeaShooter (_Direction: number) {
@@ -277,7 +284,7 @@ function Weapon_UpdateProjectileCollision () {
     for (let value of sprites.allOfKind(SpriteKind.Projectile)) {
         for (let value2 of sprites.allOfKind(SpriteKind.Slime)) {
             if (value.x < value2.x + Setting_Enemy_SlimeHitboxScale + Setting_Weapon_BulletHitboxSize && value.x > value2.x - Setting_Enemy_SlimeHitboxScale - Setting_Weapon_BulletHitboxSize) {
-                if (value.y < value2.y + Setting_Enemy_SlimeHitboxScale - Setting_Game_3248VerticalOffset + Setting_Weapon_BulletHitboxSize && value.y > value2.y - Setting_Enemy_SlimeHitboxScale - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHitboxSize) {
+                if (value.y + Setting_Weapon_BulletHeightOffset / 2 < value2.y + Setting_Enemy_SlimeHitboxScale - Setting_Game_3248VerticalOffset + Setting_Weapon_BulletHitboxSize && value.y + Setting_Weapon_BulletHeightOffset / 2 > value2.y - Setting_Enemy_SlimeHitboxScale - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHitboxSize) {
                     if (sprites.readDataNumber(value, "vertical") >= sprites.readDataNumber(value2, "vertical") - Setting_Enemy_SlimeHitboxScale && sprites.readDataNumber(value, "vertical") <= sprites.readDataNumber(value2, "vertical") + Setting_Enemy_SlimeHitboxScale) {
                         sprites.destroy(value)
                         Enemy_DamageSlime(value2, sprites.readDataNumber(value, "CurrentHealth"))
@@ -299,6 +306,14 @@ function Play_Player_PickupHelmet () {
     InterpolationCurve.Logarithmic
     ), music.PlaybackMode.InBackground)
 }
+function Weapon_Reload_Burst () {
+    if (UI_Sprite_AmmoBar.value < 99) {
+        if (game.runtime() > Weapon_LastAttack + Setting_Weapon_ReloadWait_Peashooter) {
+            UI_Sprite_AmmoBar.value = 100
+            Play_Weapon_BurstReload()
+        }
+    }
+}
 function Settings_PlayerInteraction () {
     Setting_Player_InvinvibilityFramesLength = 2500
     Setting_Interact_MaxDistance = 35
@@ -319,13 +334,8 @@ function Settings_Weapons () {
     Setting_Weapon_BulletHeightOffset = 12
     Setting_Weapon_BulletLateralOffset = 12
     Setting_Weapon_BulletHitboxSize = 2
-    Setting_Weapon_ClipSize_Peashooter = 12
-    Setting_Weapon_ReloadWait_Peashooter = 200
-    Setting_Weapon_ReloadSpeed_Peashooter = 100
-    Setting_Weapon_Damage_Peashooter = 20
-    Setting_Weapon_BulletVelocity_Peashooter = 200
-    Setting_Weapon_Firerate_Peashooter = 100
-    Setting_Weapon_Inaccuracy_Peashooter = 20
+    Settings_Peashooter()
+    Settings_BurstRifle()
 }
 function NormalizeY (_x: number, _y: number) {
     if (_y != 0) {
@@ -342,11 +352,28 @@ function UI_UpdateUserInterface () {
 function Level_Load (_level: number) {
     if (_level == 0) {
         scene.setBackgroundColor(7)
-        tiles.setCurrentTilemap(tilemap`Level_DebugMap`)
+        tiles.setCurrentTilemap(tilemap`level2`)
         Level_Sprite_Ship = sprites.create(assets.image`Lobby_Ship0`, SpriteKind.Level)
         animation.runImageAnimation(
         Level_Sprite_Ship,
-        assets.animation`Lobby_Ship2`,
+        [img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `],
         100,
         true
         )
@@ -485,6 +512,7 @@ function Play_Player_PickupMoney () {
 }
 function Pickup_CreateHealth (_X: number, _Y: number) {
     Pickup_Sprite_Money = sprites.create(assets.image`Healing_0`, SpriteKind.Potion)
+    Pickup_Sprite_Money.lifespan = 10000
     sprites.setDataNumber(Pickup_Sprite_Money, "moneyPoints", 20)
     Pickup_Sprite_Money.setPosition(_X, _Y)
     Pickup_Sprite_Money.z = Pickup_Sprite_Money.y
@@ -506,6 +534,13 @@ function _3248EnemyCollison (_Enemy1: Sprite, _Enemy2: Sprite, _Amount: number) 
     _Enemy1.y += _Amount * ((_Enemy1.y - _Enemy2.y) / Math_Vector2Magnitude(_Enemy1.x - _Enemy2.x, _Enemy1.y - _Enemy2.y))
     _Enemy2.x += _Amount * ((_Enemy2.x - _Enemy1.x) / Math_Vector2Magnitude(_Enemy2.x - _Enemy1.x, _Enemy2.y - _Enemy1.y))
     _Enemy2.y += _Amount * ((_Enemy2.y - _Enemy1.y) / Math_Vector2Magnitude(_Enemy2.x - _Enemy1.x, _Enemy2.y - _Enemy1.y))
+}
+function Pickup_CreateWeapon (_X: number, _Y: number) {
+    Pickup_Sprite_Money = sprites.create(assets.image`Weapon_1`, SpriteKind.WeaponPickup)
+    Pickup_Sprite_Money.lifespan = 10000
+    sprites.setDataNumber(Pickup_Sprite_Money, "moneyPoints", 1)
+    Pickup_Sprite_Money.setPosition(_X, _Y)
+    Pickup_Sprite_Money.z = Pickup_Sprite_Money.y
 }
 function Player_PlayerImage_Jump () {
     if (Player_hasJustJumped) {
@@ -544,7 +579,6 @@ function Weapon_Reload_PeaShooter () {
             if (game.runtime() > Weapon_LastReload + Setting_Weapon_ReloadSpeed_Peashooter) {
                 Weapon_LastReload = game.runtime()
                 UI_Sprite_AmmoBar.value += 99 / Setting_Weapon_ClipSize_Peashooter
-                Play_Weapon_PeashooterReload()
             }
         }
     }
@@ -571,10 +605,22 @@ function Enemy_UpdateSlimesDespawns () {
     }
 }
 function Pickup_CreatePickup (_X: number, _Y: number) {
-    if (Math.percentChance(95)) {
-        Pickup_CreateMoney(_X, _Y)
+    if (Player_CurrentWeapon == 0) {
+        if (Math.percentChance(70)) {
+            Pickup_CreateMoney(_X, _Y)
+        } else if (Math.percentChance(66)) {
+            Pickup_CreateWeapon(_X, _Y)
+        } else {
+            Pickup_CreateHealth(_X, _Y)
+        }
     } else {
-        Pickup_CreateHealth(_X, _Y)
+        if (Math.percentChance(80)) {
+            Pickup_CreateMoney(_X, _Y)
+        } else if (Math.percentChance(33)) {
+            Pickup_CreateWeapon(_X, _Y)
+        } else {
+            Pickup_CreateHealth(_X, _Y)
+        }
     }
 }
 function Game_StartGame () {
@@ -601,9 +647,6 @@ function Game_StartGame () {
         })
     })
 }
-function Play_Weapon_PeashooterReload () {
-	
-}
 function Weapon_Shoot () {
     if (!(Player_isLocked)) {
         if (Player_CurrentWeapon == 0) {
@@ -612,6 +655,15 @@ function Weapon_Shoot () {
                     Weapon_Fire_PeaShooter(Math_GetDirection8(dx_Stabilized(), dy_Stabilized(), 0.2))
                 } else {
                     Weapon_Fire_PeaShooter(Player_CurrentDirection)
+                }
+            }
+            Control_JustPressedButtonA = false
+        } else if (Player_CurrentWeapon == 1) {
+            if (controller.A.isPressed() && game.runtime() > Weapon_LastAttack + Setting_Weapon_ReloadWait_Burst) {
+                if (Player_CurrentState != 2 && Math_GetDirection8(dx_Stabilized(), dy_Stabilized(), 0.2) != 0) {
+                    Weapon_Fire_Burst(Math_GetDirection8(dx_Stabilized(), dy_Stabilized(), 0.2))
+                } else {
+                    Weapon_Fire_Burst(Player_CurrentDirection)
                 }
             }
             Control_JustPressedButtonA = false
@@ -665,6 +717,8 @@ function Player_PlayerImage_Left () {
     }
 }
 function UI_CreateWeapon () {
+    Player_CurrentAmmo = 0
+    Player_CurrentWeapon = 0
     UI_Sprite_WeaponFrame = sprites.create(assets.image`UI_WeaponFrame`, SpriteKind.UserInterface)
     UI_Sprite_WeaponFrame.setFlag(SpriteFlag.Ghost, true)
     UI_Sprite_WeaponFrame.setFlag(SpriteFlag.RelativeToCamera, true)
@@ -679,6 +733,12 @@ function UI_CreateWeapon () {
     UI_Sprite_AmmoBar.setColor(9, 8)
     UI_Sprite_AmmoBar.setPosition(21, 96)
     UI_Sprite_AmmoBar.z = Setting_UI_InterfaceZ - 10
+    UI_Sprite_AmmoCount = textsprite.create("99", 15, 9)
+    UI_Sprite_AmmoCount.setMaxFontHeight(5)
+    UI_Sprite_AmmoCount.setFlag(SpriteFlag.Ghost, true)
+    UI_Sprite_AmmoCount.setFlag(SpriteFlag.RelativeToCamera, true)
+    UI_Sprite_AmmoCount.setPosition(43, 113)
+    UI_Sprite_AmmoCount.z = Setting_UI_InterfaceZ + 20
 }
 function Play_KillSlime () {
     music.play(music.createSoundEffect(
@@ -720,7 +780,7 @@ function Interact_PlaceIcon () {
     }
 }
 function Level_Wizard () {
-    for (let value of tiles.getTilesByType(myTiles.tile20)) {
+    for (let value of tiles.getTilesByType(assets.tile`transparency16`)) {
         Level_Sprite_Wizard = sprites.create(assets.image`Wizard_5_0`, SpriteKind.Interact)
         tiles.placeOnTile(Level_Sprite_Wizard, tiles.getTileLocation(value.column, value.row))
         Level_Sprite_Wizard.y += -18
@@ -728,6 +788,32 @@ function Level_Wizard () {
         Level_Sprite_Wizard.z = value.y
         sprites.setDataNumber(Level_Sprite_Wizard, "InteractIndex", 2)
     }
+}
+function UI_UpdateWeapon () {
+    if (Player_CurrentWeapon != 0 && Player_CurrentAmmo <= 0) {
+        Player_CurrentWeapon = 0
+        UI_Sprite_AmmoBar.value = 100
+        Play_WeaponBreak()
+    }
+    if (Player_CurrentWeapon == 0) {
+        UI_Sprite_AmmoCount.setFlag(SpriteFlag.Invisible, true)
+        UI_Sprite_CurrentWeapon.setImage(assets.image`UI_Weapon_0`)
+    } else if (Player_CurrentWeapon == 1) {
+        UI_Sprite_AmmoCount.setFlag(SpriteFlag.Invisible, false)
+        UI_Sprite_CurrentWeapon.setImage(assets.image`UI_Weapon_1`)
+    } else {
+    	
+    }
+    UI_Sprite_AmmoCount.setText("" + convertToText(Math.trunc(Player_CurrentAmmo / 10)) + convertToText(Player_CurrentAmmo % 10))
+}
+function Settings_Peashooter () {
+    Setting_Weapon_ClipSize_Peashooter = 12
+    Setting_Weapon_ReloadWait_Peashooter = 250
+    Setting_Weapon_ReloadSpeed_Peashooter = 50
+    Setting_Weapon_Damage_Peashooter = 21
+    Setting_Weapon_BulletVelocity_Peashooter = 200
+    Setting_Weapon_Firerate_Peashooter = 150
+    Setting_Weapon_Inaccuracy_Peashooter = 20
 }
 function Game_FadeFromBlack (_Time: number) {
     timer.background(function () {
@@ -821,6 +907,8 @@ function Play_Weapon_Peashooter () {
 function Weapon_UpdateAmmo () {
     if (Player_CurrentWeapon == 0) {
         Weapon_Reload_PeaShooter()
+    } else if (Player_CurrentWeapon == 1) {
+        Weapon_Reload_Burst()
     } else {
     	
     }
@@ -895,6 +983,18 @@ function Interact_Interact () {
 function Settings_Controller () {
     Setting_Controller_InputBufferLength = 150
 }
+function Play_Player_PickupWeapon () {
+    music.play(music.createSoundEffect(
+    WaveShape.Triangle,
+    508,
+    5000,
+    Setting_Sound_EffectsVolume,
+    0,
+    150,
+    SoundExpressionEffect.None,
+    InterpolationCurve.Logarithmic
+    ), music.PlaybackMode.InBackground)
+}
 function Player_GroundMovement () {
     if (Player_Sprite_MoveController.vx > dx_Normalized() * Player_TargetSpeed) {
         Player_Sprite_MoveController.vx += Setting_Player_GroundAcceleration * -1
@@ -948,12 +1048,31 @@ function Weapon_Bullet_TinyLaser (_Direction: number, _Velocity: number, _Inaccu
     }
     Weapon_Sprite_Bullet.z = Weapon_Sprite_Bullet.y + sprites.readDataNumber(Weapon_Sprite_Bullet, "vertical")
 }
+function Weapon_Fire_Burst (_Direction: number) {
+    if (UI_Sprite_AmmoBar.value > 50) {
+        scene.cameraShake(2, 100)
+        timer.background(function () {
+            for (let index = 0; index < Setting_Weapon_Clipsize_Burst; index++) {
+                if (Player_CurrentAmmo > 0) {
+                    UI_Sprite_AmmoBar.value += -99 / Setting_Weapon_Clipsize_Burst
+                    Weapon_Bullet_TinyLaser(_Direction, Setting_Weapon_BulletVelocity_Burst, Setting_Weapon_Inaccuracy_Burst, Setting_Weapon_Damage_Burst)
+                    Play_Weapon_Burst()
+                    Weapon_LastAttack = game.runtime()
+                    Player_CurrentAmmo += -1
+                }
+                pause(Setting_Weapon_Firerate_Burst)
+            }
+        })
+    } else if (Control_JustPressedButtonA) {
+        Play_Weapon_BurstEmpty()
+    }
+}
 function Player_PlayerZ () {
     Player_Sprite_VisualsPlayer.z = Player_Sprite_MoveController.y
     Player_Sprite_VisualsHelmet.z = Player_Sprite_MoveController.y
 }
 function Level_ControlsChange () {
-    for (let value of tiles.getTilesByType(myTiles.tile21)) {
+    for (let value of tiles.getTilesByType(assets.tile`transparency16`)) {
         Level_Sprite_Computer = sprites.create(assets.image`Computer0`, SpriteKind.Dummy)
         tiles.placeOnTile(Level_Sprite_Computer, tiles.getTileLocation(value.column, value.row))
         Level_Sprite_Computer = sprites.create(assets.image`Computer`, SpriteKind.Interact)
@@ -1015,13 +1134,30 @@ function Play_Player_PickupHealth () {
     ), music.PlaybackMode.UntilDone)
 }
 function Interact_PlayerChange () {
-    tiles.placeOnRandomTile(Menu_PlayerChange, myTiles.tile18)
+    tiles.placeOnRandomTile(Menu_PlayerChange, assets.tile`transparency16`)
     tiles.setWallAt(tiles.getTileLocation(Level_Sprite_PlayerChange.tilemapLocation().column, Level_Sprite_PlayerChange.tilemapLocation().row + 1), false)
     if (Player_isMale) {
         Player_isMale = !(Player_isMale)
         animation.runImageAnimation(
         Level_Sprite_PlayerChange,
-        assets.animation`PlayerChange_0`,
+        [img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `],
         400,
         true
         )
@@ -1030,7 +1166,24 @@ function Interact_PlayerChange () {
         Player_isMale = !(Player_isMale)
         animation.runImageAnimation(
         Level_Sprite_PlayerChange,
-        assets.animation`PlayerChange_1`,
+        [img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `],
         400,
         true
         )
@@ -1152,7 +1305,24 @@ function Interact_PlayerChangeMenu () {
     Menu_PlayerChangeBackground = sprites.create(assets.image`Menu_PlayerChangeBackground`, SpriteKind.Player)
     animation.runImageAnimation(
     Menu_PlayerChangeBackground,
-    assets.animation`Menu_PlayerChangeBackground_Blink`,
+    [img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `],
     1000,
     true
     )
@@ -1177,7 +1347,7 @@ function Interact_PlayerChangeMenu () {
     Interact_ControlPlayerChangeMenu()
 }
 sprites.onOverlap(SpriteKind.Food, SpriteKind.PickupBox, function (sprite, otherSprite) {
-    sprite.follow(Player_Sprite_MoveController, 25 + 1000 / Sprites_DistanceBetweenSprites(sprite, otherSprite))
+    sprite.follow(Player_Sprite_MoveController, 15 + 1000 / Sprites_DistanceBetweenSprites(sprite, otherSprite))
 })
 function Interact_ControlPlayerChangeMenu () {
     Menu_PlayerChange.onButtonPressed(controller.A, function (selection, selectedIndex) {
@@ -1221,6 +1391,18 @@ function Interact_ControlPlayerChangeMenu () {
             Play_Menu_Change()
         }
     })
+}
+function Play_Weapon_Burst () {
+    music.play(music.createSoundEffect(
+    WaveShape.Triangle,
+    randint(4500, 5000),
+    1,
+    255,
+    0,
+    100,
+    SoundExpressionEffect.None,
+    InterpolationCurve.Curve
+    ), music.PlaybackMode.InBackground)
 }
 function Player_PlayerImage_Right () {
     if (Player_hasHelmet) {
@@ -1280,7 +1462,7 @@ function dy_Stabilized () {
     }
 }
 function Level_Walls () {
-    for (let value of tiles.getTilesByType(myTiles.tile1)) {
+    for (let value of tiles.getTilesByType(assets.tile`transparency16`)) {
         Level_Wall = sprites.create(assets.image`Bush`, SpriteKind.Level)
         tiles.placeOnTile(Level_Wall, value)
         Level_Wall.z = value.y + 8
@@ -1298,6 +1480,15 @@ function Play_Menu_Close () {
     SoundExpressionEffect.None,
     InterpolationCurve.Logarithmic
     ), music.PlaybackMode.InBackground)
+}
+function Settings_BurstRifle () {
+    Setting_Weapon_Clipsize_Burst = 6
+    Setting_Weapon_ReloadWait_Burst = 200
+    Setting_Weapon_ReloadSpeed_Burst = 100
+    Setting_Weapon_Damage_Burst = 26
+    Setting_Weapon_BulletVelocity_Burst = 200
+    Setting_Weapon_Firerate_Burst = 10
+    Setting_Weapon_Inaccuracy_Burst = 30
 }
 function Enemy_CreateSlime (_row: number, _col: number) {
     Enemy_Slime = sprites.create(assets.image`Slime_0`, SpriteKind.Slime)
@@ -1326,7 +1517,7 @@ function Enemy_UpdateSlimesCollision () {
                     if (game.runtime() > Player_LastAttacked + Setting_Player_InvinvibilityFramesLength) {
                         KnockbackSpriteFromCoordinates(1000, Player_Sprite_MoveController, value.x, value.y - Setting_Game_3248VerticalOffset)
                         Player_LastAttacked = game.runtime()
-                        DamagePlayer(10)
+                        DamagePlayer(20)
                     } else {
                         KnockbackSpriteFromCoordinates(Math.max(5, 200 / (1 + Math_Vector2Magnitude(Player_Sprite_MoveController.x - value.x, Player_Sprite_MoveController.y - (value.y - Setting_Game_3248VerticalOffset)))), Player_Sprite_MoveController, value.x, value.y - Setting_Game_3248VerticalOffset)
                     }
@@ -1347,12 +1538,12 @@ function Enemy_UpdateSlimesCollision () {
     }
 }
 function Level_Pickups () {
-    for (let value of tiles.getTilesByType(myTiles.tile36)) {
+    for (let value of tiles.getTilesByType(assets.tile`transparency16`)) {
         Level_Pickup = sprites.create(assets.image`Player_Helmet_3`, SpriteKind.Helmet)
         tiles.placeOnTile(Level_Pickup, value)
         Level_Pickup.z = value.y + 8
         tiles.setWallAt(value, false)
-        tiles.setTileAt(value, sprites.castle.tileGrass3)
+        tiles.setTileAt(value, assets.tile`transparency16`)
     }
 }
 sprites.onOverlap(SpriteKind.Potion, SpriteKind.Player, function (sprite, otherSprite) {
@@ -1450,19 +1641,53 @@ function SpawnSlime () {
     }
 }
 function Level_PlayerChange () {
-    for (let value of tiles.getTilesByType(myTiles.tile18)) {
+    for (let value of tiles.getTilesByType(assets.tile`transparency16`)) {
         Level_Sprite_PlayerChange = sprites.create(assets.image`Player2_5_0`, SpriteKind.Interact)
         if (Player_isMale) {
             animation.runImageAnimation(
             Level_Sprite_PlayerChange,
-            assets.animation`PlayerChange_1`,
+            [img`
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                `],
             400,
             true
             )
         } else {
             animation.runImageAnimation(
             Level_Sprite_PlayerChange,
-            assets.animation`PlayerChange_0`,
+            [img`
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                `],
             400,
             true
             )
@@ -1498,21 +1723,72 @@ function UI_ShakeButtonA () {
     if (Player_CurrentInteractState == 0) {
         animation.runImageAnimation(
         UI_Sprite_ButtonIconA,
-        assets.animation`UI_IconShake_1`,
+        [img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `],
         Setting_UI_ButtonIconShakeDuration / 6,
         false
         )
     } else if (Player_CurrentInteractState == 1) {
         animation.runImageAnimation(
         UI_Sprite_ButtonIconA,
-        assets.animation`UI_IconShake_0`,
+        [img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `],
         Setting_UI_ButtonIconShakeDuration / 6,
         false
         )
     } else if (Player_CurrentInteractState == 2) {
         animation.runImageAnimation(
         UI_Sprite_ButtonIconA,
-        assets.animation`UI_IconShake_0`,
+        [img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `],
         Setting_UI_ButtonIconShakeDuration / 6,
         false
         )
@@ -1694,6 +1970,9 @@ function UpdateCamera () {
     Player_CameraOffsetX = Math.constrain(Player_CameraOffsetX, Setting_Player_MovingCameraOffset * -1, Setting_Player_MovingCameraOffset)
     Player_CameraOffsetY = Math.constrain(Player_CameraOffsetY, Setting_Player_MovingCameraOffset * -1, Setting_Player_MovingCameraOffset)
     scene.centerCameraAt(Player_Sprite_VisualsPlayer.x + Math.round(Player_CameraOffsetX), Player_Sprite_VisualsPlayer.y + 6 + Math.round(Player_CameraOffsetY))
+}
+function Play_Weapon_BurstReload () {
+    music.play(music.createSoundEffect(WaveShape.Noise, 1, 5000, 32, 0, 20, SoundExpressionEffect.None, InterpolationCurve.Logarithmic), music.PlaybackMode.InBackground)
 }
 function Enemy_UpdateEnemyDespawns () {
     Enemy_UpdateSlimesDespawns()
@@ -1891,6 +2170,12 @@ function DamagePlayer (_20: number) {
         Play_Player_TakeDamage()
     }
 }
+sprites.onOverlap(SpriteKind.WeaponPickup, SpriteKind.Player, function (sprite, otherSprite) {
+    Player_CurrentWeapon = sprites.readDataNumber(sprite, "moneyPoints")
+    Player_CurrentAmmo = 99
+    sprites.destroy(sprite)
+    Play_Player_PickupWeapon()
+})
 function Player_PlayerImage_Walk () {
     if (Player_isReadyToWalk()) {
         if (Player_isFootOut) {
@@ -1913,6 +2198,9 @@ function Player_PlayerImage_Walk () {
     } else {
         Player_PlayerImage_Left()
     }
+}
+function Play_Weapon_BurstEmpty () {
+    music.play(music.createSoundEffect(WaveShape.Noise, 3880, 3877, 71, 0, 20, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
 }
 function Settings_PlayerMovement () {
     Setting_Player_WalkSpeed = 75
@@ -1964,7 +2252,24 @@ function UI_ShakeButtonB () {
     UI_isButtonBShaking = true
     animation.runImageAnimation(
     UI_Sprite_ButtonIconB,
-    assets.animation`UI_IconShake_0`,
+    [img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `],
     Setting_UI_ButtonIconShakeDuration / 6,
     false
     )
@@ -1976,7 +2281,7 @@ function LeaveTitlescreen () {
     Player_InitializePlayer()
 }
 function Level_Teleporter () {
-    for (let value of tiles.getTilesByType(myTiles.tile15)) {
+    for (let value of tiles.getTilesByType(assets.tile`transparency16`)) {
         Level_Sprite_Teleporter = sprites.create(assets.image`Teleporter_0`, SpriteKind.Interact)
         tiles.placeOnTile(Level_Sprite_Teleporter, tiles.getTileLocation(value.column, value.row))
         Level_Sprite_Teleporter.y += 8
@@ -1992,7 +2297,24 @@ function Level_Teleporter () {
         Level_Sprite_TeleporterTop.z += 5
         animation.runImageAnimation(
         Level_Sprite_TeleporterTop,
-        assets.animation`TeleporterTop`,
+        [img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `],
         100,
         true
         )
@@ -2076,23 +2398,25 @@ function Player_LimitVelocity () {
     Player_Sprite_MoveController.setVelocity(Math.constrain(Player_Sprite_MoveController.vx, -1 * Setting_Player_MaxVelocity, Setting_Player_MaxVelocity), Math.constrain(Player_Sprite_MoveController.vy, -1 * Setting_Player_MaxVelocity, Setting_Player_MaxVelocity))
 }
 function Pickup_CreateMoney (_X: number, _Y: number) {
-    Pickup_Sprite_Money = sprites.create(assets.image`Money_0`, SpriteKind.Food)
-    if (Math.percentChance(30)) {
-        Pickup_Sprite_Money.setImage(assets.image`Money_3`)
-        sprites.setDataNumber(Pickup_Sprite_Money, "moneyPoints", 20)
-    } else if (Math.percentChance(48)) {
-        Pickup_Sprite_Money.setImage(assets.image`Money_2`)
-        sprites.setDataNumber(Pickup_Sprite_Money, "moneyPoints", 50)
-    } else if (Math.percentChance(66)) {
-        Pickup_Sprite_Money.setImage(assets.image`Money_1`)
-        sprites.setDataNumber(Pickup_Sprite_Money, "moneyPoints", 100)
-    } else {
-        Pickup_Sprite_Money.setImage(assets.image`Money_0`)
-        sprites.setDataNumber(Pickup_Sprite_Money, "moneyPoints", 150)
+    for (let index = 0; index < randint(1, 5); index++) {
+        Pickup_Sprite_Money = sprites.create(assets.image`Money_0`, SpriteKind.Food)
+        if (Math.percentChance(30)) {
+            Pickup_Sprite_Money.setImage(assets.image`Money_3`)
+            sprites.setDataNumber(Pickup_Sprite_Money, "moneyPoints", 20)
+        } else if (Math.percentChance(48)) {
+            Pickup_Sprite_Money.setImage(assets.image`Money_2`)
+            sprites.setDataNumber(Pickup_Sprite_Money, "moneyPoints", 50)
+        } else if (Math.percentChance(66)) {
+            Pickup_Sprite_Money.setImage(assets.image`Money_1`)
+            sprites.setDataNumber(Pickup_Sprite_Money, "moneyPoints", 100)
+        } else {
+            Pickup_Sprite_Money.setImage(assets.image`Money_0`)
+            sprites.setDataNumber(Pickup_Sprite_Money, "moneyPoints", 150)
+        }
+        Pickup_Sprite_Money.setPosition(randint(_X - 8, 8 + _X), randint(_Y - 8, 8 + _Y))
+        Pickup_Sprite_Money.z = Pickup_Sprite_Money.y
+        Pickup_Sprite_Money.setFlag(SpriteFlag.GhostThroughWalls, true)
     }
-    Pickup_Sprite_Money.setPosition(_X, _Y)
-    Pickup_Sprite_Money.z = Pickup_Sprite_Money.y
-    Pickup_Sprite_Money.setFlag(SpriteFlag.GhostThroughWalls, true)
 }
 function Game_Brightness101 () {
     color.setColor(1, color.rgb(255, 241, 232))
@@ -2181,7 +2505,24 @@ function Enemy_UpdateSlimesMovement () {
             sprites.setDataNumber(value, "lastJump", game.runtime())
             animation.runImageAnimation(
             value,
-            assets.animation`Slime_Jump1`,
+            [img`
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                . . . . . . . . . . . . . . . . 
+                `],
             100,
             false
             )
@@ -2233,7 +2574,7 @@ function Player_CreateMoveController () {
     sprites.setDataNumber(Player_Sprite_MoveController, "vertical", 0)
     Player_Sprite_MoveController.z = 100
     Player_Sprite_MoveController.setFlag(SpriteFlag.Invisible, true)
-    tiles.placeOnRandomTile(Player_Sprite_MoveController, myTiles.tile19)
+    tiles.placeOnRandomTile(Player_Sprite_MoveController, assets.tile`transparency16`)
     Player_Sprite_PickupBox = sprites.create(assets.image`Player_PickupBox`, SpriteKind.PickupBox)
     Player_Sprite_PickupBox.setFlag(SpriteFlag.GhostThroughWalls, true)
     Player_Sprite_PickupBox.setFlag(SpriteFlag.GhostThroughTiles, true)
@@ -2299,7 +2640,7 @@ function Play_Teleport () {
 }
 function Player_CreateJumpController () {
     Player_Sprite_JumpController = sprites.create(assets.image`JumpController`, SpriteKind.Dummy)
-    spriteTileMaps.setTileMapForSprite(Player_Sprite_JumpController, tilemap`Level_JumpSpriteMap`)
+    spriteTileMaps.setTileMapForSprite(Player_Sprite_JumpController, tilemap`level1`)
     tiles.placeOnTile(Player_Sprite_JumpController, tiles.getTileLocation(1, 6))
     Player_Sprite_JumpController.ay = Setting_Player_JumpAcceleration
     Player_Sprite_JumpController.setFlag(SpriteFlag.Invisible, true)
@@ -2310,8 +2651,8 @@ function Level_CreateMoneys () {
     for (let index = 0; index < 15; index++) {
         Pickup_Sprite_Money = sprites.create(assets.image`Money_0`, SpriteKind.Food)
         sprites.setDataNumber(Pickup_Sprite_Money, "moneyPoints", 150)
-        tiles.placeOnRandomTile(Pickup_Sprite_Money, sprites.castle.tileGrass2)
-        tiles.setTileAt(Pickup_Sprite_Money.tilemapLocation(), sprites.castle.tileGrass3)
+        tiles.placeOnRandomTile(Pickup_Sprite_Money, assets.tile`transparency16`)
+        tiles.setTileAt(Pickup_Sprite_Money.tilemapLocation(), assets.tile`transparency16`)
         Pickup_Sprite_Money.z = Pickup_Sprite_Money.y + 6
     }
 }
@@ -2508,6 +2849,7 @@ let Player_LastAttacked = 0
 let Control_isControllerLocked = false
 let Control_LastPressedDirectionButton = 0
 let Enemy_Slime: Sprite = null
+let Setting_Weapon_ReloadSpeed_Burst = 0
 let Level_Wall: Sprite = null
 let Menu_PlayerChangeBackground: Sprite = null
 let Effect_Level_TeleportExplosion: SpreadEffectData = null
@@ -2518,6 +2860,11 @@ let Player_CameraOffsetX = 0
 let Menu_PlayerChange: miniMenu.MenuSprite = null
 let _WhatDistance = 0
 let _WhoisClosest = 0
+let Setting_Weapon_Firerate_Burst = 0
+let Setting_Weapon_Damage_Burst = 0
+let Setting_Weapon_Inaccuracy_Burst = 0
+let Setting_Weapon_BulletVelocity_Burst = 0
+let Setting_Weapon_Clipsize_Burst = 0
 let Weapon_Sprite_Bullet: Sprite = null
 let Level_Sprite_Computer: Sprite = null
 let Effect_Level_Teleporter: SpreadEffectData = null
@@ -2525,19 +2872,24 @@ let Level_Sprite_Teleporter: Sprite = null
 let Level_Sprite_Wizard: Sprite = null
 let Level_Sprite_PlayerChange: Sprite = null
 let Player_Sprite_VisualsInteract: Sprite = null
+let UI_Sprite_AmmoCount: TextSprite = null
 let UI_Sprite_CurrentWeapon: Sprite = null
 let UI_Sprite_WeaponFrame: Sprite = null
+let Player_CurrentAmmo = 0
 let Player_isMale = false
 let Player_Sprite_VisualsHelmet: Sprite = null
 let Player_hasHelmet = false
-let Player_CurrentWeapon = 0
+let Setting_Weapon_ReloadWait_Burst = 0
+let Setting_Weapon_Firerate_Peashooter = 0
 let Game_isPlaying = false
 let UI_Sprite_GameStart: Sprite = null
 let Game_EnemiesDefeated = 0
+let Player_CurrentWeapon = 0
 let Player_Sprite_VisualsPlayer: Sprite = null
 let Setting_Player_AirAccelMultiplier = 0
 let Setting_Player_GroundAcceleration = 0
 let Player_TargetSpeed = 0
+let Setting_Weapon_ReloadSpeed_Peashooter = 0
 let Weapon_LastReload = 0
 let Setting_Player_JumpAcceleration = 0
 let Setting_Player_FallAcceleration = 0
@@ -2569,14 +2921,12 @@ let Player_CurrentInteractState = 0
 let UI_Sprite_ButtonA: Sprite = null
 let Control_LastPressedButtonA = 0
 let Level_Sprite_Ship: Sprite = null
-let Setting_Weapon_Firerate_Peashooter = 0
-let Setting_Weapon_ReloadSpeed_Peashooter = 0
-let Setting_Weapon_ReloadWait_Peashooter = 0
 let Setting_Weapon_BulletLateralOffset = 0
-let Setting_Weapon_BulletHeightOffset = 0
 let Setting_Interact_MaxDistance = 0
 let Setting_Player_InvinvibilityFramesLength = 0
+let Setting_Weapon_ReloadWait_Peashooter = 0
 let Setting_Game_3248VerticalOffset = 0
+let Setting_Weapon_BulletHeightOffset = 0
 let Setting_Weapon_BulletHitboxSize = 0
 let Setting_Enemy_SlimeHitboxScale = 0
 let Setting_Sound_SmallEffectsMultiplier = 0
@@ -2626,6 +2976,7 @@ game.onUpdate(function () {
         Weapon_UpdateAmmo()
         Weapon_UpdateProjectileZ()
         Weapon_Shoot()
+        UI_UpdateWeapon()
     }
 })
 game.onUpdateInterval(1000, function () {
