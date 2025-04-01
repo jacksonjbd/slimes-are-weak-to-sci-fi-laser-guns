@@ -175,9 +175,6 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
         UI_Sprite_ButtonB.setImage(assets.image`UI_ButtonsFrame3`)
     }
 })
-function Play_WeaponBreak () {
-	
-}
 function Game_FadeToBlack (_Time: number) {
     timer.background(function () {
         timer.after(_Time / 5, function () {
@@ -256,9 +253,6 @@ function Level_Unload () {
 }
 function Weapon_Fire_PeaShooter (_Direction: number) {
     if (UI_Sprite_AmmoBar.value > 100 / Setting_Weapon_ClipSize_Peashooter) {
-        let Setting_Weapon_Damage_Peashooter = 0
-        let Setting_Weapon_Inaccuracy_Peashooter = 0
-        let Setting_Weapon_BulletVelocity_Peashooter = 0
         UI_Sprite_AmmoBar.value += -99 / Setting_Weapon_ClipSize_Peashooter
         Weapon_Bullet_TinyLaser(_Direction, Setting_Weapon_BulletVelocity_Peashooter, Setting_Weapon_Inaccuracy_Peashooter, Setting_Weapon_Damage_Peashooter)
         Play_Weapon_Peashooter()
@@ -283,7 +277,7 @@ function Weapon_UpdateProjectileCollision () {
     for (let value of sprites.allOfKind(SpriteKind.Projectile)) {
         for (let value2 of sprites.allOfKind(SpriteKind.Slime)) {
             if (value.x < value2.x + Setting_Enemy_SlimeHitboxScale + Setting_Weapon_BulletHitboxSize && value.x > value2.x - Setting_Enemy_SlimeHitboxScale - Setting_Weapon_BulletHitboxSize) {
-                if (value.y + Setting_Weapon_BulletHeightOffset / 2 < value2.y + Setting_Enemy_SlimeHitboxScale - Setting_Game_3248VerticalOffset + Setting_Weapon_BulletHitboxSize && value.y + Setting_Weapon_BulletHeightOffset / 2 > value2.y - Setting_Enemy_SlimeHitboxScale - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHitboxSize) {
+                if (value.y < value2.y + Setting_Enemy_SlimeHitboxScale - Setting_Game_3248VerticalOffset + Setting_Weapon_BulletHitboxSize && value.y > value2.y - Setting_Enemy_SlimeHitboxScale - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHitboxSize) {
                     if (sprites.readDataNumber(value, "vertical") >= sprites.readDataNumber(value2, "vertical") - Setting_Enemy_SlimeHitboxScale && sprites.readDataNumber(value, "vertical") <= sprites.readDataNumber(value2, "vertical") + Setting_Enemy_SlimeHitboxScale) {
                         sprites.destroy(value)
                         Enemy_DamageSlime(value2, sprites.readDataNumber(value, "CurrentHealth"))
@@ -325,6 +319,13 @@ function Settings_Weapons () {
     Setting_Weapon_BulletHeightOffset = 12
     Setting_Weapon_BulletLateralOffset = 12
     Setting_Weapon_BulletHitboxSize = 2
+    Setting_Weapon_ClipSize_Peashooter = 12
+    Setting_Weapon_ReloadWait_Peashooter = 200
+    Setting_Weapon_ReloadSpeed_Peashooter = 100
+    Setting_Weapon_Damage_Peashooter = 20
+    Setting_Weapon_BulletVelocity_Peashooter = 200
+    Setting_Weapon_Firerate_Peashooter = 100
+    Setting_Weapon_Inaccuracy_Peashooter = 20
 }
 function NormalizeY (_x: number, _y: number) {
     if (_y != 0) {
@@ -506,12 +507,6 @@ function _3248EnemyCollison (_Enemy1: Sprite, _Enemy2: Sprite, _Amount: number) 
     _Enemy2.x += _Amount * ((_Enemy2.x - _Enemy1.x) / Math_Vector2Magnitude(_Enemy2.x - _Enemy1.x, _Enemy2.y - _Enemy1.y))
     _Enemy2.y += _Amount * ((_Enemy2.y - _Enemy1.y) / Math_Vector2Magnitude(_Enemy2.x - _Enemy1.x, _Enemy2.y - _Enemy1.y))
 }
-function Pickup_CreateWeapon (_X: number, _Y: number) {
-    Pickup_Sprite_Money = sprites.create(assets.image`Healing_0`, SpriteKind.Potion)
-    sprites.setDataNumber(Pickup_Sprite_Money, "moneyPoints", 20)
-    Pickup_Sprite_Money.setPosition(_X, _Y)
-    Pickup_Sprite_Money.z = Pickup_Sprite_Money.y
-}
 function Player_PlayerImage_Jump () {
     if (Player_hasJustJumped) {
         Player_hasJustJumped = false
@@ -545,12 +540,11 @@ function Player_UpdateJumping () {
 }
 function Weapon_Reload_PeaShooter () {
     if (UI_Sprite_AmmoBar.value < 99) {
-        let Setting_Weapon_ReloadWait_Peashooter = 0
         if (game.runtime() > Weapon_LastAttack + Setting_Weapon_ReloadWait_Peashooter) {
-            let Setting_Weapon_ReloadSpeed_Peashooter = 0
             if (game.runtime() > Weapon_LastReload + Setting_Weapon_ReloadSpeed_Peashooter) {
                 Weapon_LastReload = game.runtime()
                 UI_Sprite_AmmoBar.value += 99 / Setting_Weapon_ClipSize_Peashooter
+                Play_Weapon_PeashooterReload()
             }
         }
     }
@@ -577,10 +571,8 @@ function Enemy_UpdateSlimesDespawns () {
     }
 }
 function Pickup_CreatePickup (_X: number, _Y: number) {
-    if (Math.percentChance(90)) {
+    if (Math.percentChance(95)) {
         Pickup_CreateMoney(_X, _Y)
-    } else if (Math.percentChance(50)) {
-    	
     } else {
         Pickup_CreateHealth(_X, _Y)
     }
@@ -609,10 +601,12 @@ function Game_StartGame () {
         })
     })
 }
+function Play_Weapon_PeashooterReload () {
+	
+}
 function Weapon_Shoot () {
     if (!(Player_isLocked)) {
         if (Player_CurrentWeapon == 0) {
-            let Setting_Weapon_Firerate_Peashooter = 0
             if (controller.A.isPressed() && game.runtime() > Weapon_LastAttack + Setting_Weapon_Firerate_Peashooter) {
                 if (Player_CurrentState != 2 && Math_GetDirection8(dx_Stabilized(), dy_Stabilized(), 0.2) != 0) {
                     Weapon_Fire_PeaShooter(Math_GetDirection8(dx_Stabilized(), dy_Stabilized(), 0.2))
@@ -671,8 +665,6 @@ function Player_PlayerImage_Left () {
     }
 }
 function UI_CreateWeapon () {
-    Player_CurrentAmmo = 99
-    Player_CurrentWeapon = 1
     UI_Sprite_WeaponFrame = sprites.create(assets.image`UI_WeaponFrame`, SpriteKind.UserInterface)
     UI_Sprite_WeaponFrame.setFlag(SpriteFlag.Ghost, true)
     UI_Sprite_WeaponFrame.setFlag(SpriteFlag.RelativeToCamera, true)
@@ -687,12 +679,6 @@ function UI_CreateWeapon () {
     UI_Sprite_AmmoBar.setColor(9, 8)
     UI_Sprite_AmmoBar.setPosition(21, 96)
     UI_Sprite_AmmoBar.z = Setting_UI_InterfaceZ - 10
-    UI_Sprite_AmmoCount = textsprite.create("99", 15, 9)
-    UI_Sprite_AmmoCount.setMaxFontHeight(5)
-    UI_Sprite_AmmoCount.setFlag(SpriteFlag.Ghost, true)
-    UI_Sprite_AmmoCount.setFlag(SpriteFlag.RelativeToCamera, true)
-    UI_Sprite_AmmoCount.setPosition(43, 113)
-    UI_Sprite_AmmoCount.z = Setting_UI_InterfaceZ + 20
 }
 function Play_KillSlime () {
     music.play(music.createSoundEffect(
@@ -734,7 +720,7 @@ function Interact_PlaceIcon () {
     }
 }
 function Level_Wizard () {
-    for (let value of tiles.getTilesByType(assets.tile`myTile18`)) {
+    for (let value of tiles.getTilesByType(myTiles.tile20)) {
         Level_Sprite_Wizard = sprites.create(assets.image`Wizard_5_0`, SpriteKind.Interact)
         tiles.placeOnTile(Level_Sprite_Wizard, tiles.getTileLocation(value.column, value.row))
         Level_Sprite_Wizard.y += -18
@@ -742,23 +728,6 @@ function Level_Wizard () {
         Level_Sprite_Wizard.z = value.y
         sprites.setDataNumber(Level_Sprite_Wizard, "InteractIndex", 2)
     }
-}
-function UI_UpdateWeapon () {
-    if (Player_CurrentWeapon != 0 && Player_CurrentAmmo <= 0) {
-        Player_CurrentWeapon = 0
-        UI_Sprite_AmmoBar.value = 100
-        Play_WeaponBreak()
-    }
-    if (Player_CurrentWeapon == 0) {
-        UI_Sprite_AmmoCount.setFlag(SpriteFlag.Invisible, true)
-        UI_Sprite_CurrentWeapon.setImage(assets.image`UI_Weapon_0`)
-    } else if (Player_CurrentWeapon == 1) {
-        UI_Sprite_AmmoCount.setFlag(SpriteFlag.Invisible, false)
-        UI_Sprite_CurrentWeapon.setImage(assets.image`UI_Weapon_1`)
-    } else {
-    	
-    }
-    UI_Sprite_AmmoCount.setText("" + convertToText(Math.trunc(Player_CurrentAmmo / 10)) + convertToText(Player_CurrentAmmo % 10))
 }
 function Game_FadeFromBlack (_Time: number) {
     timer.background(function () {
@@ -984,7 +953,7 @@ function Player_PlayerZ () {
     Player_Sprite_VisualsHelmet.z = Player_Sprite_MoveController.y
 }
 function Level_ControlsChange () {
-    for (let value of tiles.getTilesByType(assets.tile`myTile19`)) {
+    for (let value of tiles.getTilesByType(myTiles.tile21)) {
         Level_Sprite_Computer = sprites.create(assets.image`Computer0`, SpriteKind.Dummy)
         tiles.placeOnTile(Level_Sprite_Computer, tiles.getTileLocation(value.column, value.row))
         Level_Sprite_Computer = sprites.create(assets.image`Computer`, SpriteKind.Interact)
@@ -1046,7 +1015,7 @@ function Play_Player_PickupHealth () {
     ), music.PlaybackMode.UntilDone)
 }
 function Interact_PlayerChange () {
-    tiles.placeOnRandomTile(Menu_PlayerChange, assets.tile`myTile16`)
+    tiles.placeOnRandomTile(Menu_PlayerChange, myTiles.tile18)
     tiles.setWallAt(tiles.getTileLocation(Level_Sprite_PlayerChange.tilemapLocation().column, Level_Sprite_PlayerChange.tilemapLocation().row + 1), false)
     if (Player_isMale) {
         Player_isMale = !(Player_isMale)
@@ -1311,7 +1280,7 @@ function dy_Stabilized () {
     }
 }
 function Level_Walls () {
-    for (let value of tiles.getTilesByType(assets.tile`myTile`)) {
+    for (let value of tiles.getTilesByType(myTiles.tile1)) {
         Level_Wall = sprites.create(assets.image`Bush`, SpriteKind.Level)
         tiles.placeOnTile(Level_Wall, value)
         Level_Wall.z = value.y + 8
@@ -1378,7 +1347,7 @@ function Enemy_UpdateSlimesCollision () {
     }
 }
 function Level_Pickups () {
-    for (let value of tiles.getTilesByType(assets.tile`myTile34`)) {
+    for (let value of tiles.getTilesByType(myTiles.tile36)) {
         Level_Pickup = sprites.create(assets.image`Player_Helmet_3`, SpriteKind.Helmet)
         tiles.placeOnTile(Level_Pickup, value)
         Level_Pickup.z = value.y + 8
@@ -1481,7 +1450,7 @@ function SpawnSlime () {
     }
 }
 function Level_PlayerChange () {
-    for (let value of tiles.getTilesByType(assets.tile`myTile16`)) {
+    for (let value of tiles.getTilesByType(myTiles.tile18)) {
         Level_Sprite_PlayerChange = sprites.create(assets.image`Player2_5_0`, SpriteKind.Interact)
         if (Player_isMale) {
             animation.runImageAnimation(
@@ -1725,9 +1694,6 @@ function UpdateCamera () {
     Player_CameraOffsetX = Math.constrain(Player_CameraOffsetX, Setting_Player_MovingCameraOffset * -1, Setting_Player_MovingCameraOffset)
     Player_CameraOffsetY = Math.constrain(Player_CameraOffsetY, Setting_Player_MovingCameraOffset * -1, Setting_Player_MovingCameraOffset)
     scene.centerCameraAt(Player_Sprite_VisualsPlayer.x + Math.round(Player_CameraOffsetX), Player_Sprite_VisualsPlayer.y + 6 + Math.round(Player_CameraOffsetY))
-}
-function Play_Weapon_BurstReload () {
-    music.play(music.createSoundEffect(WaveShape.Noise, 1, 5000, 32, 0, 20, SoundExpressionEffect.None, InterpolationCurve.Logarithmic), music.PlaybackMode.InBackground)
 }
 function Enemy_UpdateEnemyDespawns () {
     Enemy_UpdateSlimesDespawns()
@@ -2010,7 +1976,7 @@ function LeaveTitlescreen () {
     Player_InitializePlayer()
 }
 function Level_Teleporter () {
-    for (let value of tiles.getTilesByType(assets.tile`myTile13`)) {
+    for (let value of tiles.getTilesByType(myTiles.tile15)) {
         Level_Sprite_Teleporter = sprites.create(assets.image`Teleporter_0`, SpriteKind.Interact)
         tiles.placeOnTile(Level_Sprite_Teleporter, tiles.getTileLocation(value.column, value.row))
         Level_Sprite_Teleporter.y += 8
@@ -2267,7 +2233,7 @@ function Player_CreateMoveController () {
     sprites.setDataNumber(Player_Sprite_MoveController, "vertical", 0)
     Player_Sprite_MoveController.z = 100
     Player_Sprite_MoveController.setFlag(SpriteFlag.Invisible, true)
-    tiles.placeOnRandomTile(Player_Sprite_MoveController, assets.tile`myTile17`)
+    tiles.placeOnRandomTile(Player_Sprite_MoveController, myTiles.tile19)
     Player_Sprite_PickupBox = sprites.create(assets.image`Player_PickupBox`, SpriteKind.PickupBox)
     Player_Sprite_PickupBox.setFlag(SpriteFlag.GhostThroughWalls, true)
     Player_Sprite_PickupBox.setFlag(SpriteFlag.GhostThroughTiles, true)
@@ -2559,10 +2525,8 @@ let Level_Sprite_Teleporter: Sprite = null
 let Level_Sprite_Wizard: Sprite = null
 let Level_Sprite_PlayerChange: Sprite = null
 let Player_Sprite_VisualsInteract: Sprite = null
-let UI_Sprite_AmmoCount: TextSprite = null
 let UI_Sprite_CurrentWeapon: Sprite = null
 let UI_Sprite_WeaponFrame: Sprite = null
-let Player_CurrentAmmo = 0
 let Player_isMale = false
 let Player_Sprite_VisualsHelmet: Sprite = null
 let Player_hasHelmet = false
@@ -2605,15 +2569,21 @@ let Player_CurrentInteractState = 0
 let UI_Sprite_ButtonA: Sprite = null
 let Control_LastPressedButtonA = 0
 let Level_Sprite_Ship: Sprite = null
+let Setting_Weapon_Firerate_Peashooter = 0
+let Setting_Weapon_ReloadSpeed_Peashooter = 0
+let Setting_Weapon_ReloadWait_Peashooter = 0
 let Setting_Weapon_BulletLateralOffset = 0
+let Setting_Weapon_BulletHeightOffset = 0
 let Setting_Interact_MaxDistance = 0
 let Setting_Player_InvinvibilityFramesLength = 0
 let Setting_Game_3248VerticalOffset = 0
-let Setting_Weapon_BulletHeightOffset = 0
 let Setting_Weapon_BulletHitboxSize = 0
 let Setting_Enemy_SlimeHitboxScale = 0
 let Setting_Sound_SmallEffectsMultiplier = 0
 let Weapon_LastAttack = 0
+let Setting_Weapon_Damage_Peashooter = 0
+let Setting_Weapon_Inaccuracy_Peashooter = 0
+let Setting_Weapon_BulletVelocity_Peashooter = 0
 let Control_JustPressedButtonA = false
 let Setting_Weapon_ClipSize_Peashooter = 0
 let UI_Sprite_AmmoBar: StatusBarSprite = null
@@ -2656,7 +2626,6 @@ game.onUpdate(function () {
         Weapon_UpdateAmmo()
         Weapon_UpdateProjectileZ()
         Weapon_Shoot()
-        UI_UpdateWeapon()
     }
 })
 game.onUpdateInterval(1000, function () {
