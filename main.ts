@@ -153,6 +153,39 @@ function Player_InitializePlayer () {
     UI_CreateUserInterface()
     Game_doesPlayerExist = true
 }
+function Weapon_Bullet_TinyLaser2 (_Direction: number, _Velocity: number, _Inaccuracy: number, _Damage: number) {
+    Weapon_Sprite_Bullet = sprites.create(assets.image`Laser_4`, SpriteKind.Projectile)
+    sprites.setDataNumber(Weapon_Sprite_Bullet, "vertical", sprites.readDataNumber(Player_Sprite_MoveController, "vertical") + Setting_Weapon_BulletHeightOffset / 2)
+    sprites.setDataNumber(Weapon_Sprite_Bullet, "CurrentHealth", _Damage)
+    Weapon_Sprite_Bullet.lifespan = 5000
+    Weapon_Sprite_Bullet.setFlag(SpriteFlag.Ghost, true)
+    if (_Direction == 2) {
+        Weapon_Sprite_Bullet.setVelocity(0.707 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy), -0.707 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy))
+        Weapon_Sprite_Bullet.setPosition(Player_Sprite_VisualsPlayer.x + 0.707 * Setting_Weapon_BulletLateralOffset, Player_Sprite_VisualsPlayer.y - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHeightOffset - 0.707 * Setting_Weapon_BulletLateralOffset)
+    } else if (_Direction == 3) {
+        Weapon_Sprite_Bullet.setVelocity(_Velocity + randint(-1 * _Inaccuracy, _Inaccuracy), randint(-1 * _Inaccuracy, _Inaccuracy))
+        Weapon_Sprite_Bullet.setPosition(Player_Sprite_VisualsPlayer.x + Setting_Weapon_BulletLateralOffset, Player_Sprite_VisualsPlayer.y - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHeightOffset)
+    } else if (_Direction == 4) {
+        Weapon_Sprite_Bullet.setVelocity(0.707 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy), 0.707 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy))
+        Weapon_Sprite_Bullet.setPosition(Player_Sprite_VisualsPlayer.x + 0.707 * Setting_Weapon_BulletLateralOffset, Player_Sprite_VisualsPlayer.y - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHeightOffset + 0.707 * Setting_Weapon_BulletLateralOffset)
+    } else if (_Direction == 1) {
+        Weapon_Sprite_Bullet.setVelocity(randint(-1 * _Inaccuracy, _Inaccuracy), -1 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy))
+        Weapon_Sprite_Bullet.setPosition(Player_Sprite_VisualsPlayer.x, Player_Sprite_VisualsPlayer.y - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHeightOffset - Setting_Weapon_BulletLateralOffset)
+    } else if (_Direction == 6) {
+        Weapon_Sprite_Bullet.setVelocity(-0.707 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy), 0.707 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy))
+        Weapon_Sprite_Bullet.setPosition(Player_Sprite_VisualsPlayer.x - 0.707 * Setting_Weapon_BulletLateralOffset, Player_Sprite_VisualsPlayer.y - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHeightOffset + 0.707 * Setting_Weapon_BulletLateralOffset)
+    } else if (_Direction == 7) {
+        Weapon_Sprite_Bullet.setVelocity(-1 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy), randint(-1 * _Inaccuracy, _Inaccuracy))
+        Weapon_Sprite_Bullet.setPosition(Player_Sprite_VisualsPlayer.x - Setting_Weapon_BulletLateralOffset, Player_Sprite_VisualsPlayer.y - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHeightOffset)
+    } else if (_Direction == 8) {
+        Weapon_Sprite_Bullet.setVelocity(-0.707 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy), -0.707 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy))
+        Weapon_Sprite_Bullet.setPosition(Player_Sprite_VisualsPlayer.x - 0.707 * Setting_Weapon_BulletLateralOffset, Player_Sprite_VisualsPlayer.y - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHeightOffset - 0.707 * Setting_Weapon_BulletLateralOffset)
+    } else {
+        Weapon_Sprite_Bullet.setVelocity(randint(-1 * _Inaccuracy, _Inaccuracy), _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy))
+        Weapon_Sprite_Bullet.setPosition(Player_Sprite_VisualsPlayer.x, Player_Sprite_VisualsPlayer.y - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHeightOffset + Setting_Weapon_BulletLateralOffset)
+    }
+    Weapon_Sprite_Bullet.z = Weapon_Sprite_Bullet.y + sprites.readDataNumber(Weapon_Sprite_Bullet, "vertical")
+}
 function Game_Brightness100 () {
     color.setColor(1, color.rgb(255, 241, 232))
     color.setColor(2, color.rgb(255, 0, 77))
@@ -1056,7 +1089,7 @@ function Weapon_Fire_Burst (_Direction: number) {
             for (let index = 0; index < Setting_Weapon_Clipsize_Burst; index++) {
                 if (Player_CurrentAmmo > 0) {
                     UI_Sprite_AmmoBar.value += -99 / Setting_Weapon_Clipsize_Burst
-                    Weapon_Bullet_TinyLaser(_Direction, Setting_Weapon_BulletVelocity_Burst, Setting_Weapon_Inaccuracy_Burst, Setting_Weapon_Damage_Burst)
+                    Weapon_Bullet_TinyLaser2(_Direction, Setting_Weapon_BulletVelocity_Burst, Setting_Weapon_Inaccuracy_Burst, Setting_Weapon_Damage_Burst)
                     Play_Weapon_Burst()
                     Weapon_LastAttack = game.runtime()
                     Player_CurrentAmmo += -1
@@ -2691,7 +2724,6 @@ let Setting_Weapon_Damage_Burst = 0
 let Setting_Weapon_Inaccuracy_Burst = 0
 let Setting_Weapon_BulletVelocity_Burst = 0
 let Setting_Weapon_Clipsize_Burst = 0
-let Weapon_Sprite_Bullet: Sprite = null
 let Level_Sprite_Computer: Sprite = null
 let Effect_Level_Teleporter: SpreadEffectData = null
 let Level_Sprite_Teleporter: Sprite = null
@@ -2712,7 +2744,6 @@ let UI_Sprite_GameStart: Sprite = null
 let Game_EnemiesDefeated = 0
 let Player_CurrentWeapon = 0
 let UI_Sprite_HealthBar: StatusBarSprite = null
-let Player_Sprite_VisualsPlayer: Sprite = null
 let Setting_Player_AirAccelMultiplier = 0
 let Setting_Player_GroundAcceleration = 0
 let Player_TargetSpeed = 0
@@ -2748,12 +2779,9 @@ let Player_CurrentInteractState = 0
 let UI_Sprite_ButtonA: Sprite = null
 let Control_LastPressedButtonA = 0
 let Level_Sprite_Ship: Sprite = null
-let Setting_Weapon_BulletLateralOffset = 0
 let Setting_Interact_MaxDistance = 0
 let Setting_Player_InvinvibilityFramesLength = 0
 let Setting_Weapon_ReloadWait_Peashooter = 0
-let Setting_Game_3248VerticalOffset = 0
-let Setting_Weapon_BulletHeightOffset = 0
 let Setting_Weapon_BulletHitboxSize = 0
 let Setting_Enemy_SlimeHitboxScale = 0
 let Setting_Sound_SmallEffectsMultiplier = 0
@@ -2769,6 +2797,11 @@ let Player_Sprite_JumpController: Sprite = null
 let UI_Sprite_ButtonB: Sprite = null
 let Control_LastPressedButtonB = 0
 let Player_isLocked = false
+let Setting_Game_3248VerticalOffset = 0
+let Setting_Weapon_BulletLateralOffset = 0
+let Player_Sprite_VisualsPlayer: Sprite = null
+let Setting_Weapon_BulletHeightOffset = 0
+let Weapon_Sprite_Bullet: Sprite = null
 let Game_doesPlayerExist = false
 let Setting_UI_ButtonIconShakeDuration = 0
 let Setting_UI_InterfaceZ = 0

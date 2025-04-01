@@ -764,6 +764,11 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "Intro_Interactive1"
     },
+    "image149": {
+        "data": "hwQJAAkAAAAAAAAAAAAAAAAAAAAAAAAAACAiAAAAAAAAEhECAAAAAAASEQIAAAAAABIRAgAAAAAAICIAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        "mimeType": "image/x-mkcd-f4",
+        "displayName": "Laser_4"
+    },
     "anim4": {
         "namespace": "myAnimations",
         "id": "anim4",
