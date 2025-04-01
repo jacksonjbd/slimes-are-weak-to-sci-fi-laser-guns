@@ -297,16 +297,6 @@
         "tilemapTile": true,
         "displayName": "myTile46"
     },
-    "level6": {
-        "id": "level6",
-        "mimeType": "application/mkcd-tilemap",
-        "data": "MTAwMzAwMDgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAxMDEwMTAwMDAwMDAwMDAwMDAwMDAwMDAwMjAyMg==",
-        "tileset": [
-            "myTiles.transparency16",
-            "sprites.castle.tileGrass2"
-        ],
-        "displayName": "Level_JumpSpriteMap"
-    },
     "level2": {
         "id": "level2",
         "mimeType": "application/mkcd-tilemap",
@@ -403,6 +393,16 @@
             "myTiles.tile39"
         ],
         "displayName": "level1"
+    },
+    "level6": {
+        "id": "level6",
+        "mimeType": "application/mkcd-tilemap",
+        "data": "MTAwMzAwMDgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAxMDEwMTAwMDAwMDAwMDAwMDAwMDAwMDAwMjAyMg==",
+        "tileset": [
+            "myTiles.transparency16",
+            "sprites.castle.tileGrass2"
+        ],
+        "displayName": "Level_JumpSpriteMap"
     },
     "*": {
         "mimeType": "image/x-mkcd-f4",

@@ -352,28 +352,11 @@ function UI_UpdateUserInterface () {
 function Level_Load (_level: number) {
     if (_level == 0) {
         scene.setBackgroundColor(7)
-        tiles.setCurrentTilemap(tilemap`level2`)
+        tiles.setCurrentTilemap(tilemap`Level_DebugMap`)
         Level_Sprite_Ship = sprites.create(assets.image`Lobby_Ship0`, SpriteKind.Level)
         animation.runImageAnimation(
         Level_Sprite_Ship,
-        [img`
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            `],
+        assets.animation`Lobby_Ship2`,
         100,
         true
         )
@@ -797,7 +780,7 @@ function Interact_PlaceIcon () {
     }
 }
 function Level_Wizard () {
-    for (let value of tiles.getTilesByType(assets.tile`transparency16`)) {
+    for (let value of tiles.getTilesByType(assets.tile`myTile18`)) {
         Level_Sprite_Wizard = sprites.create(assets.image`Wizard_5_0`, SpriteKind.Interact)
         tiles.placeOnTile(Level_Sprite_Wizard, tiles.getTileLocation(value.column, value.row))
         Level_Sprite_Wizard.y += -18
@@ -1089,7 +1072,7 @@ function Player_PlayerZ () {
     Player_Sprite_VisualsHelmet.z = Player_Sprite_MoveController.y
 }
 function Level_ControlsChange () {
-    for (let value of tiles.getTilesByType(assets.tile`transparency16`)) {
+    for (let value of tiles.getTilesByType(assets.tile`myTile19`)) {
         Level_Sprite_Computer = sprites.create(assets.image`Computer0`, SpriteKind.Dummy)
         tiles.placeOnTile(Level_Sprite_Computer, tiles.getTileLocation(value.column, value.row))
         Level_Sprite_Computer = sprites.create(assets.image`Computer`, SpriteKind.Interact)
@@ -1479,7 +1462,7 @@ function dy_Stabilized () {
     }
 }
 function Level_Walls () {
-    for (let value of tiles.getTilesByType(assets.tile`transparency16`)) {
+    for (let value of tiles.getTilesByType(assets.tile`myTile`)) {
         Level_Wall = sprites.create(assets.image`Bush`, SpriteKind.Level)
         tiles.placeOnTile(Level_Wall, value)
         Level_Wall.z = value.y + 8
@@ -1658,53 +1641,19 @@ function SpawnSlime () {
     }
 }
 function Level_PlayerChange () {
-    for (let value of tiles.getTilesByType(assets.tile`transparency16`)) {
+    for (let value of tiles.getTilesByType(assets.tile`myTile16`)) {
         Level_Sprite_PlayerChange = sprites.create(assets.image`Player2_5_0`, SpriteKind.Interact)
         if (Player_isMale) {
             animation.runImageAnimation(
             Level_Sprite_PlayerChange,
-            [img`
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                `],
+            assets.animation`PlayerChange_0`,
             400,
             true
             )
         } else {
             animation.runImageAnimation(
             Level_Sprite_PlayerChange,
-            [img`
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                `],
+            assets.animation`PlayerChange_1`,
             400,
             true
             )
@@ -2298,7 +2247,7 @@ function LeaveTitlescreen () {
     Player_InitializePlayer()
 }
 function Level_Teleporter () {
-    for (let value of tiles.getTilesByType(assets.tile`transparency16`)) {
+    for (let value of tiles.getTilesByType(assets.tile`myTile13`)) {
         Level_Sprite_Teleporter = sprites.create(assets.image`Teleporter_0`, SpriteKind.Interact)
         tiles.placeOnTile(Level_Sprite_Teleporter, tiles.getTileLocation(value.column, value.row))
         Level_Sprite_Teleporter.y += 8
@@ -2314,24 +2263,7 @@ function Level_Teleporter () {
         Level_Sprite_TeleporterTop.z += 5
         animation.runImageAnimation(
         Level_Sprite_TeleporterTop,
-        [img`
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            `],
+        assets.animation`TeleporterTop`,
         100,
         true
         )
@@ -2591,7 +2523,7 @@ function Player_CreateMoveController () {
     sprites.setDataNumber(Player_Sprite_MoveController, "vertical", 0)
     Player_Sprite_MoveController.z = 100
     Player_Sprite_MoveController.setFlag(SpriteFlag.Invisible, true)
-    tiles.placeOnRandomTile(Player_Sprite_MoveController, assets.tile`transparency16`)
+    tiles.placeOnRandomTile(Player_Sprite_MoveController, assets.tile`myTile17`)
     Player_Sprite_PickupBox = sprites.create(assets.image`Player_PickupBox`, SpriteKind.PickupBox)
     Player_Sprite_PickupBox.setFlag(SpriteFlag.GhostThroughWalls, true)
     Player_Sprite_PickupBox.setFlag(SpriteFlag.GhostThroughTiles, true)
@@ -2657,7 +2589,7 @@ function Play_Teleport () {
 }
 function Player_CreateJumpController () {
     Player_Sprite_JumpController = sprites.create(assets.image`JumpController`, SpriteKind.Dummy)
-    spriteTileMaps.setTileMapForSprite(Player_Sprite_JumpController, tilemap`level1`)
+    spriteTileMaps.setTileMapForSprite(Player_Sprite_JumpController, tilemap`Level_JumpSpriteMap`)
     tiles.placeOnTile(Player_Sprite_JumpController, tiles.getTileLocation(1, 6))
     Player_Sprite_JumpController.ay = Setting_Player_JumpAcceleration
     Player_Sprite_JumpController.setFlag(SpriteFlag.Invisible, true)
@@ -2668,8 +2600,8 @@ function Level_CreateMoneys () {
     for (let index = 0; index < 15; index++) {
         Pickup_Sprite_Money = sprites.create(assets.image`Money_0`, SpriteKind.Food)
         sprites.setDataNumber(Pickup_Sprite_Money, "moneyPoints", 150)
-        tiles.placeOnRandomTile(Pickup_Sprite_Money, assets.tile`transparency16`)
-        tiles.setTileAt(Pickup_Sprite_Money.tilemapLocation(), assets.tile`transparency16`)
+        tiles.placeOnRandomTile(Pickup_Sprite_Money, sprites.castle.tileGrass2)
+        tiles.setTileAt(Pickup_Sprite_Money.tilemapLocation(), sprites.castle.tileGrass3)
         Pickup_Sprite_Money.z = Pickup_Sprite_Money.y + 6
     }
 }
