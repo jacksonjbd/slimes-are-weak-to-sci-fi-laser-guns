@@ -73,7 +73,7 @@ namespace SpriteKind {
 function Play_Player_BreakHelmet () {
     music.play(music.createSoundEffect(WaveShape.Sawtooth, 3112, 3068, 255, 0, 500, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
     music.play(music.createSoundEffect(WaveShape.Noise, 5000, 3068, 255, 0, 100, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
-    scene.cameraShake(4, 200)
+    scene.cameraShake(3, 500)
 }
 function Play_Menu_Change () {
     music.play(music.createSoundEffect(
@@ -519,24 +519,7 @@ function _3248EnemyCollison (_Enemy1: Sprite, _Enemy2: Sprite, _Amount: number) 
     _Enemy2.y += _Amount * ((_Enemy2.y - _Enemy1.y) / Math_Vector2Magnitude(_Enemy2.x - _Enemy1.x, _Enemy2.y - _Enemy1.y))
 }
 function Pickup_CreateWeapon (_X: number, _Y: number) {
-    Pickup_Sprite_Money = sprites.create(img`
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . 3 . . . . . . . 3 . . . . . 
-        . . 3 . . . . . . . 3 . . . . . 
-        . . 3 . . . . . . . 3 . . . . . 
-        . . 3 . . . . . . . 3 . . . . . 
-        . . . 3 . . . . . . 3 . . . . . 
-        . . . 3 . . . . . . 3 . . . . . 
-        . . . 3 . . . . . . . 3 . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . 3 3 . . . . . . . 3 3 3 . . 
-        . . . 3 3 3 3 3 3 3 3 3 . . . . 
-        . . . . . . . . . . . . . . . . 
-        `, SpriteKind.WeaponPickup)
+    Pickup_Sprite_Money = sprites.create(assets.image`Weapon_1`, SpriteKind.WeaponPickup)
     Pickup_Sprite_Money.lifespan = 10000
     sprites.setDataNumber(Pickup_Sprite_Money, "moneyPoints", 1)
     Pickup_Sprite_Money.setPosition(_X, _Y)
@@ -605,7 +588,15 @@ function Enemy_UpdateSlimesDespawns () {
     }
 }
 function Pickup_CreatePickup (_X: number, _Y: number) {
-    if (Player_CurrentWeapon == 0) {
+    if (UI_Sprite_HealthBar.value < 25) {
+        if (Math.percentChance(60)) {
+            Pickup_CreateMoney(_X, _Y)
+        } else if (Math.percentChance(33)) {
+            Pickup_CreateWeapon(_X, _Y)
+        } else {
+            Pickup_CreateHealth(_X, _Y)
+        }
+    } else if (Player_CurrentWeapon == 0) {
         if (Math.percentChance(70)) {
             Pickup_CreateMoney(_X, _Y)
         } else if (Math.percentChance(66)) {
@@ -642,7 +633,7 @@ function Game_StartGame () {
                 UI_Sprite_GameStart.lifespan = 2000
                 Player_isLocked = false
                 Game_isPlaying = true
-                info.startCountdown(300)
+                info.startCountdown(180)
             })
         })
     })
@@ -995,6 +986,9 @@ function Play_Player_PickupWeapon () {
     InterpolationCurve.Logarithmic
     ), music.PlaybackMode.InBackground)
 }
+sprites.onOverlap(SpriteKind.WeaponPickup, SpriteKind.PickupBox, function (sprite, otherSprite) {
+    sprite.follow(Player_Sprite_MoveController, 1 + 500 / Sprites_DistanceBetweenSprites(sprite, otherSprite))
+})
 function Player_GroundMovement () {
     if (Player_Sprite_MoveController.vx > dx_Normalized() * Player_TargetSpeed) {
         Player_Sprite_MoveController.vx += Setting_Player_GroundAcceleration * -1
@@ -1067,6 +1061,9 @@ function Weapon_Fire_Burst (_Direction: number) {
         Play_Weapon_BurstEmpty()
     }
 }
+sprites.onOverlap(SpriteKind.Potion, SpriteKind.PickupBox, function (sprite, otherSprite) {
+    sprite.follow(Player_Sprite_MoveController, 1 + 500 / Sprites_DistanceBetweenSprites(sprite, otherSprite))
+})
 function Player_PlayerZ () {
     Player_Sprite_VisualsPlayer.z = Player_Sprite_MoveController.y
     Player_Sprite_VisualsHelmet.z = Player_Sprite_MoveController.y
@@ -1140,24 +1137,7 @@ function Interact_PlayerChange () {
         Player_isMale = !(Player_isMale)
         animation.runImageAnimation(
         Level_Sprite_PlayerChange,
-        [img`
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            `],
+        assets.animation`PlayerChange_0`,
         400,
         true
         )
@@ -1166,24 +1146,7 @@ function Interact_PlayerChange () {
         Player_isMale = !(Player_isMale)
         animation.runImageAnimation(
         Level_Sprite_PlayerChange,
-        [img`
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            `],
+        assets.animation`PlayerChange_1`,
         400,
         true
         )
@@ -1267,6 +1230,7 @@ function Interact_TeleportToGame () {
     Game_isTeleporting = true
     Player_CameraOffsetX = 1
     Player_CameraOffsetY = 1
+    tiles.placeOnTile(Player_Sprite_JumpController, tiles.getTileLocation(1, 6))
     Player_Sprite_MoveController.setVelocity(0, 0)
     Player_Sprite_MoveController.setPosition(Level_Sprite_Teleporter.x, Level_Sprite_Teleporter.y)
     extraEffects.createSpreadEffectAt(Effect_Level_PlayerTeleport, Level_Sprite_Teleporter.x, Level_Sprite_Teleporter.y + 0, 5000, 16, 151)
@@ -1305,24 +1269,7 @@ function Interact_PlayerChangeMenu () {
     Menu_PlayerChangeBackground = sprites.create(assets.image`Menu_PlayerChangeBackground`, SpriteKind.Player)
     animation.runImageAnimation(
     Menu_PlayerChangeBackground,
-    [img`
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        `],
+    assets.animation`Menu_PlayerChangeBackground_Blink`,
     1000,
     true
     )
@@ -1515,9 +1462,13 @@ function Enemy_UpdateSlimesCollision () {
             if (Player_Sprite_MoveController.y < value.y + Setting_Enemy_SlimeHitboxScale - Setting_Game_3248VerticalOffset && Player_Sprite_MoveController.y > value.y - Setting_Enemy_SlimeHitboxScale - Setting_Game_3248VerticalOffset) {
                 if (sprites.readDataNumber(Player_Sprite_MoveController, "vertical") < sprites.readDataNumber(value, "vertical") + Setting_Enemy_SlimeHitboxScale) {
                     if (game.runtime() > Player_LastAttacked + Setting_Player_InvinvibilityFramesLength) {
-                        KnockbackSpriteFromCoordinates(1000, Player_Sprite_MoveController, value.x, value.y - Setting_Game_3248VerticalOffset)
+                        Player_isLocked = true
+                        KnockbackSpriteFromCoordinates(500, Player_Sprite_MoveController, value.x, value.y - Setting_Game_3248VerticalOffset)
                         Player_LastAttacked = game.runtime()
-                        DamagePlayer(20)
+                        DamagePlayer(10)
+                        timer.after(500, function () {
+                            Player_isLocked = false
+                        })
                     } else {
                         KnockbackSpriteFromCoordinates(Math.max(5, 200 / (1 + Math_Vector2Magnitude(Player_Sprite_MoveController.x - value.x, Player_Sprite_MoveController.y - (value.y - Setting_Game_3248VerticalOffset)))), Player_Sprite_MoveController, value.x, value.y - Setting_Game_3248VerticalOffset)
                     }
@@ -1538,12 +1489,12 @@ function Enemy_UpdateSlimesCollision () {
     }
 }
 function Level_Pickups () {
-    for (let value of tiles.getTilesByType(assets.tile`transparency16`)) {
+    for (let value of tiles.getTilesByType(assets.tile`myTile34`)) {
         Level_Pickup = sprites.create(assets.image`Player_Helmet_3`, SpriteKind.Helmet)
         tiles.placeOnTile(Level_Pickup, value)
         Level_Pickup.z = value.y + 8
         tiles.setWallAt(value, false)
-        tiles.setTileAt(value, assets.tile`transparency16`)
+        tiles.setTileAt(value, sprites.castle.tileGrass3)
     }
 }
 sprites.onOverlap(SpriteKind.Potion, SpriteKind.Player, function (sprite, otherSprite) {
@@ -1646,14 +1597,14 @@ function Level_PlayerChange () {
         if (Player_isMale) {
             animation.runImageAnimation(
             Level_Sprite_PlayerChange,
-            assets.animation`PlayerChange_0`,
+            assets.animation`PlayerChange_1`,
             400,
             true
             )
         } else {
             animation.runImageAnimation(
             Level_Sprite_PlayerChange,
-            assets.animation`PlayerChange_1`,
+            assets.animation`PlayerChange_0`,
             400,
             true
             )
@@ -1689,72 +1640,21 @@ function UI_ShakeButtonA () {
     if (Player_CurrentInteractState == 0) {
         animation.runImageAnimation(
         UI_Sprite_ButtonIconA,
-        [img`
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            `],
+        assets.animation`UI_IconShake_1`,
         Setting_UI_ButtonIconShakeDuration / 6,
         false
         )
     } else if (Player_CurrentInteractState == 1) {
         animation.runImageAnimation(
         UI_Sprite_ButtonIconA,
-        [img`
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            `],
+        assets.animation`UI_IconShake_1`,
         Setting_UI_ButtonIconShakeDuration / 6,
         false
         )
     } else if (Player_CurrentInteractState == 2) {
         animation.runImageAnimation(
         UI_Sprite_ButtonIconA,
-        [img`
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            . . . . . . . . . . . . . . . . 
-            `],
+        assets.animation`UI_IconShake_1`,
         Setting_UI_ButtonIconShakeDuration / 6,
         false
         )
@@ -2115,7 +2015,7 @@ function Player_ShadowVisuals () {
 function Play_Player_TakeDamage () {
     music.play(music.createSoundEffect(WaveShape.Noise, 5000, 1, 255, 0, 100, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
     music.play(music.createSoundEffect(WaveShape.Noise, 1110, 1, 255, 0, 100, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
-    scene.cameraShake(6, 200)
+    scene.cameraShake(6, 500)
 }
 function Player_PlaceOnOffset () {
     Player_Sprite_VisualsPlayer.setPosition(Player_Sprite_MoveController.x, Player_Sprite_MoveController.y - (104 - Player_Sprite_JumpController.y) * Setting_Player_VisualJumpMultiplier + Setting_Game_3248VerticalOffset)
@@ -2218,24 +2118,7 @@ function UI_ShakeButtonB () {
     UI_isButtonBShaking = true
     animation.runImageAnimation(
     UI_Sprite_ButtonIconB,
-    [img`
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        `],
+    assets.animation`UI_IconShake_0`,
     Setting_UI_ButtonIconShakeDuration / 6,
     false
     )
@@ -2454,24 +2337,7 @@ function Enemy_UpdateSlimesMovement () {
             sprites.setDataNumber(value, "lastJump", game.runtime())
             animation.runImageAnimation(
             value,
-            [img`
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                . . . . . . . . . . . . . . . . 
-                `],
+            assets.animation`Slime_Jump1`,
             100,
             false
             )
@@ -2792,7 +2658,6 @@ let UI_isButtonAShaking = false
 let UI_LastButtonAShake = 0
 let Setting_Player_WalkSpeed = 0
 let UI_Sprite_ButtonFrame: Sprite = null
-let UI_Sprite_HealthBar: StatusBarSprite = null
 let Level_Pickup: Sprite = null
 let Player_LastAttacked = 0
 let Control_isControllerLocked = false
@@ -2834,6 +2699,7 @@ let Game_isPlaying = false
 let UI_Sprite_GameStart: Sprite = null
 let Game_EnemiesDefeated = 0
 let Player_CurrentWeapon = 0
+let UI_Sprite_HealthBar: StatusBarSprite = null
 let Player_Sprite_VisualsPlayer: Sprite = null
 let Setting_Player_AirAccelMultiplier = 0
 let Setting_Player_GroundAcceleration = 0
