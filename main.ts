@@ -1016,35 +1016,35 @@ function Weapon_Bullet_TinyLaser (_Direction: number, _Velocity: number, _Inaccu
     Weapon_Sprite_Bullet.setFlag(SpriteFlag.Ghost, true)
     if (_Direction == 2) {
         Weapon_Sprite_Bullet.setImage(assets.image`Laser_1`)
-        Weapon_Sprite_Bullet.setVelocity(0.707 * _Velocity, -0.707 * _Velocity)
+        Weapon_Sprite_Bullet.setVelocity(0.707 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy), -0.707 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy))
         Weapon_Sprite_Bullet.setPosition(Player_Sprite_VisualsPlayer.x + 0.707 * Setting_Weapon_BulletLateralOffset, Player_Sprite_VisualsPlayer.y - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHeightOffset - 0.707 * Setting_Weapon_BulletLateralOffset)
     } else if (_Direction == 3) {
         Weapon_Sprite_Bullet.setImage(assets.image`Laser_2`)
-        Weapon_Sprite_Bullet.setVelocity(_Velocity, randint(-1 * _Inaccuracy, _Inaccuracy))
+        Weapon_Sprite_Bullet.setVelocity(_Velocity + randint(-1 * _Inaccuracy, _Inaccuracy), randint(-1 * _Inaccuracy, _Inaccuracy))
         Weapon_Sprite_Bullet.setPosition(Player_Sprite_VisualsPlayer.x + Setting_Weapon_BulletLateralOffset, Player_Sprite_VisualsPlayer.y - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHeightOffset)
     } else if (_Direction == 4) {
         Weapon_Sprite_Bullet.setImage(assets.image`Laser_0`)
-        Weapon_Sprite_Bullet.setVelocity(0.707 * _Velocity, 0.707 * _Velocity)
+        Weapon_Sprite_Bullet.setVelocity(0.707 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy), 0.707 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy))
         Weapon_Sprite_Bullet.setPosition(Player_Sprite_VisualsPlayer.x + 0.707 * Setting_Weapon_BulletLateralOffset, Player_Sprite_VisualsPlayer.y - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHeightOffset + 0.707 * Setting_Weapon_BulletLateralOffset)
     } else if (_Direction == 1) {
         Weapon_Sprite_Bullet.setImage(assets.image`Laser_3`)
-        Weapon_Sprite_Bullet.setVelocity(randint(-1 * _Inaccuracy, _Inaccuracy), -1 * _Velocity)
+        Weapon_Sprite_Bullet.setVelocity(randint(-1 * _Inaccuracy, _Inaccuracy), -1 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy))
         Weapon_Sprite_Bullet.setPosition(Player_Sprite_VisualsPlayer.x, Player_Sprite_VisualsPlayer.y - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHeightOffset - Setting_Weapon_BulletLateralOffset)
     } else if (_Direction == 6) {
         Weapon_Sprite_Bullet.setImage(assets.image`Laser_1`)
-        Weapon_Sprite_Bullet.setVelocity(-0.707 * _Velocity, 0.707 * _Velocity)
+        Weapon_Sprite_Bullet.setVelocity(-0.707 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy), 0.707 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy))
         Weapon_Sprite_Bullet.setPosition(Player_Sprite_VisualsPlayer.x - 0.707 * Setting_Weapon_BulletLateralOffset, Player_Sprite_VisualsPlayer.y - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHeightOffset + 0.707 * Setting_Weapon_BulletLateralOffset)
     } else if (_Direction == 7) {
         Weapon_Sprite_Bullet.setImage(assets.image`Laser_2`)
-        Weapon_Sprite_Bullet.setVelocity(-1 * _Velocity, randint(-1 * _Inaccuracy, _Inaccuracy))
+        Weapon_Sprite_Bullet.setVelocity(-1 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy), randint(-1 * _Inaccuracy, _Inaccuracy))
         Weapon_Sprite_Bullet.setPosition(Player_Sprite_VisualsPlayer.x - Setting_Weapon_BulletLateralOffset, Player_Sprite_VisualsPlayer.y - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHeightOffset)
     } else if (_Direction == 8) {
         Weapon_Sprite_Bullet.setImage(assets.image`Laser_0`)
-        Weapon_Sprite_Bullet.setVelocity(-0.707 * _Velocity, -0.707 * _Velocity)
+        Weapon_Sprite_Bullet.setVelocity(-0.707 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy), -0.707 * _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy))
         Weapon_Sprite_Bullet.setPosition(Player_Sprite_VisualsPlayer.x - 0.707 * Setting_Weapon_BulletLateralOffset, Player_Sprite_VisualsPlayer.y - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHeightOffset - 0.707 * Setting_Weapon_BulletLateralOffset)
     } else {
         Weapon_Sprite_Bullet.setImage(assets.image`Laser_3`)
-        Weapon_Sprite_Bullet.setVelocity(randint(-1 * _Inaccuracy, _Inaccuracy), _Velocity)
+        Weapon_Sprite_Bullet.setVelocity(randint(-1 * _Inaccuracy, _Inaccuracy), _Velocity + randint(-1 * _Inaccuracy, _Inaccuracy))
         Weapon_Sprite_Bullet.setPosition(Player_Sprite_VisualsPlayer.x, Player_Sprite_VisualsPlayer.y - Setting_Game_3248VerticalOffset - Setting_Weapon_BulletHeightOffset + Setting_Weapon_BulletLateralOffset)
     }
     Weapon_Sprite_Bullet.z = Weapon_Sprite_Bullet.y + sprites.readDataNumber(Weapon_Sprite_Bullet, "vertical")
