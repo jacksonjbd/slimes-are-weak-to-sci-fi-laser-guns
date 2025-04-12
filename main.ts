@@ -1008,7 +1008,11 @@ function Interact_Interact () {
     } else if (Interact_WhoIsClosest() == 3) {
         Interact_TeleportToGame()
     } else if (Interact_WhoIsClosest() == 4) {
-        Interact_ChangeControlsMenu()
+        if (Setting_Game_IsArcadeMode) {
+            Interact_WizardDialog2()
+        } else {
+            Interact_ChangeControlsMenu()
+        }
     }
 }
 function Settings_Controller () {
@@ -1854,6 +1858,18 @@ function Enemy_DamageSlime (_Enemy: Sprite, _Damage: number) {
     } else {
         _Enemy.setFlag(SpriteFlag.Invisible, false)
     }
+}
+function Interact_WizardDialog2 () {
+    Player_isLocked = true
+    Play_Menu_Open()
+    game.showLongText("Someone was coding a game here...", DialogLayout.Bottom)
+    Play_Menu_Change()
+    game.showLongText("...", DialogLayout.Bottom)
+    Play_Menu_Change()
+    game.showLongText("There's a lot of blocks.", DialogLayout.Bottom)
+    Play_Menu_Close()
+    pause(100)
+    Player_isLocked = false
 }
 function Enemy_UpdateEnemyMovement () {
     Enemy_UpdateSlimesMovement()
@@ -2813,13 +2829,19 @@ let Player_CurrentDirection = 0
 let Player_CurrentState = 0
 let Player_Sprite_MoveController: Sprite = null
 let Setting_Sound_EffectsVolume = 0
+let Setting_Game_IsArcadeMode = false
+Setting_Game_IsArcadeMode = true
 music.stopAllSounds()
 Settings_Sound()
-if (blockSettings.exists("ControlScheme")) {
-    Game_SetControls(blockSettings.readNumber("ControlScheme"))
+if (Setting_Game_IsArcadeMode) {
     WhiskyjackIntro()
 } else {
-    Interact_ChangeControlsMenu2()
+    if (blockSettings.exists("ControlScheme")) {
+        Game_SetControls(blockSettings.readNumber("ControlScheme"))
+        WhiskyjackIntro()
+    } else {
+        Interact_ChangeControlsMenu2()
+    }
 }
 game.onUpdate(function () {
     if (Game_doesPlayerExist) {
