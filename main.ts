@@ -13,15 +13,15 @@ namespace SpriteKind {
 /**
  * Sprite Directions 8:
  * 
- *    ┌       /\      ┐
+ * ┌       /\      ┐
  * 
- *        8   1   2    
+ * 8   1   2
  * 
- *   <   7    0    3   >
+ * <   7    0    3   >
  * 
- *        6   5   4    
+ * 6   5   4
  * 
- *    └       \/      ┘
+ * └       \/      ┘
  */
 /**
  * Interact States:
@@ -57,19 +57,17 @@ namespace SpriteKind {
  * 
  * 4 - Locked
  */
-/**
- * == Slime Data Types ==
- * 
- * "lastJump" (time since start (ms))
- * 
- * Upwards Position "Vertical" 
- * 
- * "MoveX" 
- * 
- * "MoveY" 
- * 
- * "CurrentHealth"
- */
+// == Slime Data Types ==
+// 
+// "lastJump" (time since start (ms))
+// 
+// Upwards Position "Vertical"
+// 
+// "MoveX"
+// 
+// "MoveY"
+// 
+// "CurrentHealth"
 function Play_Player_BreakHelmet () {
     music.play(music.createSoundEffect(WaveShape.Sawtooth, 3112, 3068, 255, 0, 500, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
     music.play(music.createSoundEffect(WaveShape.Noise, 5000, 3068, 255, 0, 100, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
@@ -93,46 +91,10 @@ function Player_UpdateDirection () {
     }
 }
 function Play_Game_Start1 () {
-    music.play(music.createSoundEffect(
-    WaveShape.Sine,
-    73.4,
-    73.4,
-    75,
-    0,
-    500,
-    SoundExpressionEffect.None,
-    InterpolationCurve.Linear
-    ), music.PlaybackMode.InBackground)
-    music.play(music.createSoundEffect(
-    WaveShape.Sine,
-    73.4,
-    73.4,
-    75,
-    0,
-    500,
-    SoundExpressionEffect.None,
-    InterpolationCurve.Linear
-    ), music.PlaybackMode.InBackground)
-    music.play(music.createSoundEffect(
-    WaveShape.Triangle,
-    293,
-    293,
-    75,
-    0,
-    500,
-    SoundExpressionEffect.None,
-    InterpolationCurve.Linear
-    ), music.PlaybackMode.InBackground)
-    music.play(music.createSoundEffect(
-    WaveShape.Sawtooth,
-    392,
-    392,
-    75,
-    0,
-    500,
-    SoundExpressionEffect.None,
-    InterpolationCurve.Linear
-    ), music.PlaybackMode.InBackground)
+    music.play(music.createSoundEffect(WaveShape.Sine, 73.4, 73.4, 75, 0, 500, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
+    music.play(music.createSoundEffect(WaveShape.Sine, 73.4, 73.4, 75, 0, 500, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
+    music.play(music.createSoundEffect(WaveShape.Triangle, 293, 293, 75, 0, 500, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
+    music.play(music.createSoundEffect(WaveShape.Sawtooth, 392, 392, 75, 0, 500, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
 }
 function Settings_CameraUI () {
     Setting_Camera_ScrenshakeIntensity = 4
@@ -203,12 +165,6 @@ function Game_Brightness100 () {
     color.setColor(14, color.rgb(233, 118, 83))
     color.setColor(15, color.rgb(0, 0, 0))
 }
-controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (!(Player_isLocked) && Game_doesPlayerExist) {
-        Control_LastPressedButtonB = game.runtime()
-        UI_Sprite_ButtonB.setImage(assets.image`UI_ButtonsFrame3`)
-    }
-})
 function Play_WeaponBreak () {
     music.play(music.createSoundEffect(WaveShape.Sawtooth, 1374, 1286, 36, 0, 200, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
     music.play(music.createSoundEffect(WaveShape.Noise, 1857, 1506, 142, 0, 100, SoundExpressionEffect.Vibrato, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
@@ -370,6 +326,12 @@ function Settings_Weapons () {
     Settings_Peashooter()
     Settings_BurstRifle()
 }
+controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (!(Player_isLocked) && Game_doesPlayerExist) {
+        Control_LastPressedButtonB = game.runtime()
+        UI_Sprite_ButtonB.setImage(assets.image`UI_ButtonsFrame3`)
+    }
+})
 function NormalizeY (_x: number, _y: number) {
     if (_y != 0) {
         return _y / Math_Vector2Magnitude(_x, _y)
@@ -409,17 +371,6 @@ function Level_Load (_level: number) {
     Level_ControlsChange()
     Level_Teleporter()
 }
-controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (!(Player_isLocked) && Game_doesPlayerExist) {
-        Control_LastPressedButtonA = game.runtime()
-        UI_Sprite_ButtonA.setImage(assets.image`UI_ButtonsFrame2`)
-        if (Player_CurrentInteractState == 1) {
-            Interact_Interact()
-        } else {
-            Control_JustPressedButtonA = true
-        }
-    }
-})
 function TitleScreen () {
     mySprite = sprites.create(assets.image`TitleScreen`, SpriteKind.Introduction)
     Game_FadeFromBlack2(500)
@@ -433,16 +384,22 @@ function WhiskyjackIntro () {
     music.play(music.createSong(assets.song`Jacksong`), music.PlaybackMode.LoopingInBackground)
     music.setVolume(255)
     Intro_Background = sprites.create(assets.image`Intro_Backdrop`, SpriteKind.Introduction)
-    Intro_Background.setPosition(-95, 0)
-    Intro_Background.setVelocity(20, 20)
+    Intro_Background.setPosition(47, 120)
+    Intro_Background.setVelocity(20, 0)
     Intro_Bird = sprites.create(assets.image`Intro_Bird_Sleeping`, SpriteKind.Introduction)
-    Intro_Bird.setPosition(45, 36)
+    Intro_Bird.setPosition(90, 72)
+    Intro_Bird.scale = 2
     Intro_Logo = sprites.create(assets.image`Intro_Whiskyjack`, SpriteKind.Introduction)
     Intro_Logo.setPosition(78, 64)
+    Intro_Logo.setPosition(Intro_Logo.x * 2, Intro_Logo.y * 2)
+    Intro_Logo.scale = 2
     Intro_Logo2 = sprites.create(assets.image`Intro_Interactive`, SpriteKind.Introduction)
     Intro_Logo2.setPosition(78, 64)
+    Intro_Logo2.setPosition(Intro_Logo2.x * 2, Intro_Logo2.y * 2)
+    Intro_Logo2.scale = 2
     Intro_Logo2 = sprites.create(assets.image`Intro_Interactive1`, SpriteKind.Introduction)
-    Intro_Logo2.setPosition(78, 83)
+    Intro_Logo2.setPosition(78, 96)
+    Intro_Logo2.setPosition(Intro_Logo2.x * 2, Intro_Logo2.y * 2)
     timer.after(2500, function () {
         Game_FadeToBlack2(500)
         timer.after(750, function () {
@@ -549,12 +506,6 @@ function Play_Player_Jump () {
     InterpolationCurve.Linear
     ), music.PlaybackMode.InBackground)
 }
-function _3248EnemyCollison (_Enemy1: Sprite, _Enemy2: Sprite, _Amount: number) {
-    _Enemy1.x += _Amount * ((_Enemy1.x - _Enemy2.x) / Math_Vector2Magnitude(_Enemy1.x - _Enemy2.x, _Enemy1.y - _Enemy2.y))
-    _Enemy1.y += _Amount * ((_Enemy1.y - _Enemy2.y) / Math_Vector2Magnitude(_Enemy1.x - _Enemy2.x, _Enemy1.y - _Enemy2.y))
-    _Enemy2.x += _Amount * ((_Enemy2.x - _Enemy1.x) / Math_Vector2Magnitude(_Enemy2.x - _Enemy1.x, _Enemy2.y - _Enemy1.y))
-    _Enemy2.y += _Amount * ((_Enemy2.y - _Enemy1.y) / Math_Vector2Magnitude(_Enemy2.x - _Enemy1.x, _Enemy2.y - _Enemy1.y))
-}
 function Pickup_CreateWeapon (_X: number, _Y: number) {
     Pickup_Sprite_Money = sprites.create(assets.image`Weapon_1`, SpriteKind.WeaponPickup)
     Pickup_Sprite_Money.lifespan = 10000
@@ -616,14 +567,25 @@ function Player_AirMovement () {
     }
 }
 function Enemy_UpdateSlimesDespawns () {
-    for (let value of sprites.allOfKind(SpriteKind.Slime)) {
-        if (value.x < Player_Sprite_VisualsPlayer.x + (Setting_Enemy_SpawnHorizontalOffset + Setting_Enemy_DespawnOffset) && value.x > Player_Sprite_MoveController.x - (Setting_Enemy_SpawnHorizontalOffset - Setting_Enemy_DespawnOffset)) {
-            if (value.y - Setting_Game_3248VerticalOffset < Player_Sprite_VisualsPlayer.y + (Setting_Enemy_SpawnVerticalOffset + Setting_Enemy_DespawnOffset) && value.y - Setting_Game_3248VerticalOffset > Player_Sprite_MoveController.y - (Setting_Enemy_SpawnVerticalOffset - Setting_Enemy_DespawnOffset)) {
-                value.lifespan = 1500
+    for (let value3 of sprites.allOfKind(SpriteKind.Slime)) {
+        if (value3.x < Player_Sprite_VisualsPlayer.x + (Setting_Enemy_SpawnHorizontalOffset + Setting_Enemy_DespawnOffset) && value3.x > Player_Sprite_MoveController.x - (Setting_Enemy_SpawnHorizontalOffset - Setting_Enemy_DespawnOffset)) {
+            if (value3.y - Setting_Game_3248VerticalOffset < Player_Sprite_VisualsPlayer.y + (Setting_Enemy_SpawnVerticalOffset + Setting_Enemy_DespawnOffset) && value3.y - Setting_Game_3248VerticalOffset > Player_Sprite_MoveController.y - (Setting_Enemy_SpawnVerticalOffset - Setting_Enemy_DespawnOffset)) {
+                value3.lifespan = 1500
             }
         }
     }
 }
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (!(Player_isLocked) && Game_doesPlayerExist) {
+        Control_LastPressedButtonA = game.runtime()
+        UI_Sprite_ButtonA.setImage(assets.image`UI_ButtonsFrame2`)
+        if (Player_CurrentInteractState == 1) {
+            Interact_Interact()
+        } else {
+            Control_JustPressedButtonA = true
+        }
+    }
+})
 function Pickup_CreatePickup (_X: number, _Y: number) {
     if (UI_Sprite_HealthBar.value < 25) {
         if (Math.percentChance(60)) {
@@ -772,16 +734,7 @@ function UI_CreateWeapon () {
     UI_Sprite_AmmoCount.z = Setting_UI_InterfaceZ + 20
 }
 function Play_KillSlime () {
-    music.play(music.createSoundEffect(
-    WaveShape.Noise,
-    1418,
-    1,
-    255,
-    0,
-    100,
-    SoundExpressionEffect.None,
-    InterpolationCurve.Linear
-    ), music.PlaybackMode.InBackground)
+    music.play(music.createSoundEffect(WaveShape.Noise, 1418, 1, 255, 0, 100, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
 }
 function Interact_PlaceIcon () {
     if (Interact_WhoIsClosest() == 0) {
@@ -811,12 +764,12 @@ function Interact_PlaceIcon () {
     }
 }
 function Level_Wizard () {
-    for (let value of tiles.getTilesByType(assets.tile`myTile18`)) {
+    for (let value4 of tiles.getTilesByType(assets.tile`myTile18`)) {
         Level_Sprite_Wizard = sprites.create(assets.image`Wizard_5_0`, SpriteKind.Interact)
-        tiles.placeOnTile(Level_Sprite_Wizard, tiles.getTileLocation(value.column, value.row))
+        tiles.placeOnTile(Level_Sprite_Wizard, tiles.getTileLocation(value4.column, value4.row))
         Level_Sprite_Wizard.y += -18
-        tiles.setWallAt(tiles.getTileLocation(value.column, value.row), true)
-        Level_Sprite_Wizard.z = value.y
+        tiles.setWallAt(tiles.getTileLocation(value4.column, value4.row), true)
+        Level_Sprite_Wizard.z = value4.y
         sprites.setDataNumber(Level_Sprite_Wizard, "InteractIndex", 2)
     }
 }
@@ -1030,9 +983,6 @@ function Play_Player_PickupWeapon () {
     InterpolationCurve.Logarithmic
     ), music.PlaybackMode.InBackground)
 }
-sprites.onOverlap(SpriteKind.WeaponPickup, SpriteKind.PickupBox, function (sprite, otherSprite) {
-    sprite.follow(Player_Sprite_MoveController, 1 + 500 / Sprites_DistanceBetweenSprites(sprite, otherSprite))
-})
 function Player_GroundMovement () {
     if (Player_Sprite_MoveController.vx > dx_Normalized() * Player_TargetSpeed) {
         Player_Sprite_MoveController.vx += Setting_Player_GroundAcceleration * -1
@@ -1105,21 +1055,18 @@ function Weapon_Fire_Burst (_Direction: number) {
         Play_Weapon_BurstEmpty()
     }
 }
-sprites.onOverlap(SpriteKind.Potion, SpriteKind.PickupBox, function (sprite, otherSprite) {
-    sprite.follow(Player_Sprite_MoveController, 1 + 500 / Sprites_DistanceBetweenSprites(sprite, otherSprite))
-})
 function Player_PlayerZ () {
     Player_Sprite_VisualsPlayer.z = Player_Sprite_MoveController.y
     Player_Sprite_VisualsHelmet.z = Player_Sprite_MoveController.y
 }
 function Level_ControlsChange () {
-    for (let value of tiles.getTilesByType(assets.tile`myTile19`)) {
+    for (let value5 of tiles.getTilesByType(assets.tile`myTile19`)) {
         Level_Sprite_Computer = sprites.create(assets.image`Computer0`, SpriteKind.Dummy)
-        tiles.placeOnTile(Level_Sprite_Computer, tiles.getTileLocation(value.column, value.row))
+        tiles.placeOnTile(Level_Sprite_Computer, tiles.getTileLocation(value5.column, value5.row))
         Level_Sprite_Computer = sprites.create(assets.image`Computer`, SpriteKind.Interact)
-        tiles.placeOnTile(Level_Sprite_Computer, tiles.getTileLocation(value.column, value.row))
-        tiles.setWallAt(tiles.getTileLocation(value.column, value.row), true)
-        Level_Sprite_Computer.z = value.y
+        tiles.placeOnTile(Level_Sprite_Computer, tiles.getTileLocation(value5.column, value5.row))
+        tiles.setWallAt(tiles.getTileLocation(value5.column, value5.row), true)
+        Level_Sprite_Computer.z = value5.y
         sprites.setDataNumber(Level_Sprite_Computer, "InteractIndex", 4)
     }
 }
@@ -1145,14 +1092,17 @@ function KnockbackSpriteFromCoordinates (_Velocity: number, _Sprite: Sprite, _x:
     _Sprite.vx += _Velocity * ((_Sprite.x - _x) / Math_Vector2Magnitude(_Sprite.x - _x, _Sprite.y - _y))
     _Sprite.vy += _Velocity * ((_Sprite.y - _y) / Math_Vector2Magnitude(_Sprite.x - _x, _Sprite.y - _y))
 }
+sprites.onOverlap(SpriteKind.Food, SpriteKind.PickupBox, function (sprite, otherSprite) {
+    sprite.follow(Player_Sprite_MoveController, 15 + 1000 / Sprites_DistanceBetweenSprites(sprite, otherSprite))
+})
 function Interact_WhoIsClosest () {
     if (sprites.allOfKind(SpriteKind.Interact).length > 0) {
         _WhoisClosest = 0
         _WhatDistance = 0
-        for (let value of sprites.allOfKind(SpriteKind.Interact)) {
-            if (_WhoisClosest == 0 || _WhatDistance > Math_Vector2Magnitude(Math.abs(Player_Sprite_MoveController.x - value.x), Math.abs(Player_Sprite_MoveController.y - (value.y - Setting_Game_3248VerticalOffset)))) {
-                _WhoisClosest = sprites.readDataNumber(value, "InteractIndex")
-                _WhatDistance = Math_Vector2Magnitude(Math.abs(Player_Sprite_MoveController.x - value.x), Math.abs(Player_Sprite_MoveController.y - (value.y - Setting_Game_3248VerticalOffset)))
+        for (let value6 of sprites.allOfKind(SpriteKind.Interact)) {
+            if (_WhoisClosest == 0 || _WhatDistance > Math_Vector2Magnitude(Math.abs(Player_Sprite_MoveController.x - value6.x), Math.abs(Player_Sprite_MoveController.y - (value6.y - Setting_Game_3248VerticalOffset)))) {
+                _WhoisClosest = sprites.readDataNumber(value6, "InteractIndex")
+                _WhatDistance = Math_Vector2Magnitude(Math.abs(Player_Sprite_MoveController.x - value6.x), Math.abs(Player_Sprite_MoveController.y - (value6.y - Setting_Game_3248VerticalOffset)))
             }
         }
         if (_WhatDistance > Setting_Interact_MaxDistance) {
@@ -1165,16 +1115,7 @@ function Interact_WhoIsClosest () {
     }
 }
 function Play_Player_PickupHealth () {
-    music.play(music.createSoundEffect(
-    WaveShape.Sine,
-    1,
-    5000,
-    255,
-    0,
-    200,
-    SoundExpressionEffect.None,
-    InterpolationCurve.Logarithmic
-    ), music.PlaybackMode.UntilDone)
+    music.play(music.createSoundEffect(WaveShape.Sine, 1, 5000, 255, 0, 200, SoundExpressionEffect.None, InterpolationCurve.Logarithmic), music.PlaybackMode.UntilDone)
 }
 function Interact_PlayerChange () {
     tiles.placeOnRandomTile(Menu_PlayerChange, assets.tile`transparency16`)
@@ -1299,13 +1240,6 @@ function Interact_TeleportToGame () {
         })
     })
 }
-sprites.onOverlap(SpriteKind.Player, SpriteKind.Helmet, function (sprite, otherSprite) {
-    if (!(Player_hasHelmet)) {
-        sprites.destroy(otherSprite)
-        Player_hasHelmet = true
-        Play_Player_PickupHelmet()
-    }
-})
 function Interact_PlayerChangeMenu () {
     Player_isLocked = true
     Play_Menu_Open()
@@ -1340,9 +1274,6 @@ function Interact_PlayerChangeMenu () {
     Menu_PlayerChange.z = Setting_UI_InterfaceZ + 110
     Interact_ControlPlayerChangeMenu()
 }
-sprites.onOverlap(SpriteKind.Food, SpriteKind.PickupBox, function (sprite, otherSprite) {
-    sprite.follow(Player_Sprite_MoveController, 15 + 1000 / Sprites_DistanceBetweenSprites(sprite, otherSprite))
-})
 function Interact_ControlPlayerChangeMenu () {
     Menu_PlayerChange.onButtonPressed(controller.A, function (selection, selectedIndex) {
         Menu_PlayerChange.close()
@@ -1456,11 +1387,11 @@ function dy_Stabilized () {
     }
 }
 function Level_Walls () {
-    for (let value of tiles.getTilesByType(assets.tile`myTile`)) {
+    for (let value7 of tiles.getTilesByType(assets.tile`myTile`)) {
         Level_Wall = sprites.create(assets.image`Bush`, SpriteKind.Level)
-        tiles.placeOnTile(Level_Wall, value)
-        Level_Wall.z = value.y + 8
-        tiles.setWallAt(value, true)
+        tiles.placeOnTile(Level_Wall, value7)
+        Level_Wall.z = value7.y + 8
+        tiles.setWallAt(value7, true)
     }
 }
 function Play_Menu_Close () {
@@ -1504,30 +1435,30 @@ function Game_CreateVariables () {
     Control_isControllerLocked = false
 }
 function Enemy_UpdateSlimesCollision () {
-    for (let value of sprites.allOfKind(SpriteKind.Slime)) {
-        if (Player_Sprite_MoveController.x < value.x + Setting_Enemy_SlimeHitboxScale && Player_Sprite_MoveController.x > value.x - Setting_Enemy_SlimeHitboxScale) {
-            if (Player_Sprite_MoveController.y < value.y + Setting_Enemy_SlimeHitboxScale - Setting_Game_3248VerticalOffset && Player_Sprite_MoveController.y > value.y - Setting_Enemy_SlimeHitboxScale - Setting_Game_3248VerticalOffset) {
-                if (sprites.readDataNumber(Player_Sprite_MoveController, "vertical") < sprites.readDataNumber(value, "vertical") + Setting_Enemy_SlimeHitboxScale) {
+    for (let value8 of sprites.allOfKind(SpriteKind.Slime)) {
+        if (Player_Sprite_MoveController.x < value8.x + Setting_Enemy_SlimeHitboxScale && Player_Sprite_MoveController.x > value8.x - Setting_Enemy_SlimeHitboxScale) {
+            if (Player_Sprite_MoveController.y < value8.y + Setting_Enemy_SlimeHitboxScale - Setting_Game_3248VerticalOffset && Player_Sprite_MoveController.y > value8.y - Setting_Enemy_SlimeHitboxScale - Setting_Game_3248VerticalOffset) {
+                if (sprites.readDataNumber(Player_Sprite_MoveController, "vertical") < sprites.readDataNumber(value8, "vertical") + Setting_Enemy_SlimeHitboxScale) {
                     if (game.runtime() > Player_LastAttacked + Setting_Player_InvinvibilityFramesLength) {
                         Player_isLocked = true
-                        KnockbackSpriteFromCoordinates(500, Player_Sprite_MoveController, value.x, value.y - Setting_Game_3248VerticalOffset)
+                        KnockbackSpriteFromCoordinates(500, Player_Sprite_MoveController, value8.x, value8.y - Setting_Game_3248VerticalOffset)
                         Player_LastAttacked = game.runtime()
                         DamagePlayer(10)
                         timer.after(500, function () {
                             Player_isLocked = false
                         })
                     } else {
-                        KnockbackSpriteFromCoordinates(Math.max(5, 200 / (1 + Math_Vector2Magnitude(Player_Sprite_MoveController.x - value.x, Player_Sprite_MoveController.y - (value.y - Setting_Game_3248VerticalOffset)))), Player_Sprite_MoveController, value.x, value.y - Setting_Game_3248VerticalOffset)
+                        KnockbackSpriteFromCoordinates(Math.max(5, 200 / (1 + Math_Vector2Magnitude(Player_Sprite_MoveController.x - value8.x, Player_Sprite_MoveController.y - (value8.y - Setting_Game_3248VerticalOffset)))), Player_Sprite_MoveController, value8.x, value8.y - Setting_Game_3248VerticalOffset)
                     }
                 }
             }
         }
-        for (let value2 of sprites.allOfKind(SpriteKind.Slime)) {
-            if (value != value2) {
-                if (value2.x < value.x + Setting_Enemy_SlimeHitboxScale && value2.x > value.x - Setting_Enemy_SlimeHitboxScale) {
-                    if (value2.y - Setting_Game_3248VerticalOffset < value.y + Setting_Enemy_SlimeHitboxScale - Setting_Game_3248VerticalOffset && value2.y - Setting_Game_3248VerticalOffset > value.y - Setting_Enemy_SlimeHitboxScale - Setting_Game_3248VerticalOffset) {
-                        if (sprites.readDataNumber(value2, "vertical") < sprites.readDataNumber(value, "vertical") + Setting_Enemy_SlimeHitboxScale) {
-                            _3248EnemyCollison(value, value2, 2)
+        for (let value22 of sprites.allOfKind(SpriteKind.Slime)) {
+            if (value8 != value22) {
+                if (value22.x < value8.x + Setting_Enemy_SlimeHitboxScale && value22.x > value8.x - Setting_Enemy_SlimeHitboxScale) {
+                    if (value22.y - Setting_Game_3248VerticalOffset < value8.y + Setting_Enemy_SlimeHitboxScale - Setting_Game_3248VerticalOffset && value22.y - Setting_Game_3248VerticalOffset > value8.y - Setting_Enemy_SlimeHitboxScale - Setting_Game_3248VerticalOffset) {
+                        if (sprites.readDataNumber(value22, "vertical") < sprites.readDataNumber(value8, "vertical") + Setting_Enemy_SlimeHitboxScale) {
+                            _3248EnemyCollison(value8, value22, 2)
                         }
                     }
                 }
@@ -1536,12 +1467,12 @@ function Enemy_UpdateSlimesCollision () {
     }
 }
 function Level_Pickups () {
-    for (let value of tiles.getTilesByType(assets.tile`myTile34`)) {
+    for (let value9 of tiles.getTilesByType(assets.tile`myTile34`)) {
         Level_Pickup = sprites.create(assets.image`Player_Helmet_3`, SpriteKind.Helmet)
-        tiles.placeOnTile(Level_Pickup, value)
-        Level_Pickup.z = value.y + 8
-        tiles.setWallAt(value, false)
-        tiles.setTileAt(value, sprites.castle.tileGrass3)
+        tiles.placeOnTile(Level_Pickup, value9)
+        Level_Pickup.z = value9.y + 8
+        tiles.setWallAt(value9, false)
+        tiles.setTileAt(value9, sprites.castle.tileGrass3)
     }
 }
 sprites.onOverlap(SpriteKind.Potion, SpriteKind.Player, function (sprite, otherSprite) {
@@ -1567,61 +1498,16 @@ function UI_CreateButtons () {
     UI_Sprite_ButtonB.z = Setting_UI_InterfaceZ + 10
 }
 function Weapon_UpdateProjectileZ () {
-    for (let value of sprites.allOfKind(SpriteKind.Projectile)) {
-        value.z = value.y + sprites.readDataNumber(value, "vertical")
+    for (let value10 of sprites.allOfKind(SpriteKind.Projectile)) {
+        value10.z = value10.y + sprites.readDataNumber(value10, "vertical")
     }
 }
 function Play_Game_Start2 () {
-    music.play(music.createSoundEffect(
-    WaveShape.Sine,
-    98,
-    98,
-    75,
-    0,
-    1000,
-    SoundExpressionEffect.None,
-    InterpolationCurve.Linear
-    ), music.PlaybackMode.InBackground)
-    music.play(music.createSoundEffect(
-    WaveShape.Sine,
-    146.8,
-    146.8,
-    75,
-    0,
-    1000,
-    SoundExpressionEffect.None,
-    InterpolationCurve.Linear
-    ), music.PlaybackMode.InBackground)
-    music.play(music.createSoundEffect(
-    WaveShape.Triangle,
-    392,
-    392,
-    75,
-    0,
-    1000,
-    SoundExpressionEffect.None,
-    InterpolationCurve.Linear
-    ), music.PlaybackMode.InBackground)
-    music.play(music.createSoundEffect(
-    WaveShape.Triangle,
-    587,
-    587,
-    75,
-    0,
-    1000,
-    SoundExpressionEffect.None,
-    InterpolationCurve.Linear
-    ), music.PlaybackMode.InBackground)
-    music.play(music.createSoundEffect(
-    WaveShape.Sawtooth,
-    783,
-    783,
-    75,
-    0,
-    1000,
-    SoundExpressionEffect.None,
-    InterpolationCurve.Linear
-    ), music.PlaybackMode.InBackground)
+    music.play(music.createSoundEffect(WaveShape.Sine, 98, 98, 75, 0, 1000, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
+    music.play(music.createSoundEffect(WaveShape.Sine, 146.8, 146.8, 75, 0, 1000, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
+    music.play(music.createSoundEffect(WaveShape.Triangle, 392, 392, 75, 0, 1000, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
+    music.play(music.createSoundEffect(WaveShape.Triangle, 587, 587, 75, 0, 1000, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
+    music.play(music.createSoundEffect(WaveShape.Sawtooth, 783, 783, 75, 0, 1000, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.InBackground)
 }
 function SpawnSlime () {
     if (Math.percentChance(60)) {
@@ -1639,7 +1525,7 @@ function SpawnSlime () {
     }
 }
 function Level_PlayerChange () {
-    for (let value of tiles.getTilesByType(assets.tile`myTile16`)) {
+    for (let value11 of tiles.getTilesByType(assets.tile`myTile16`)) {
         Level_Sprite_PlayerChange = sprites.create(assets.image`Player2_5_0`, SpriteKind.Interact)
         if (Player_isMale) {
             animation.runImageAnimation(
@@ -1656,15 +1542,12 @@ function Level_PlayerChange () {
             true
             )
         }
-        tiles.setWallAt(tiles.getTileLocation(value.column, value.row), true)
-        tiles.placeOnTile(Level_Sprite_PlayerChange, tiles.getTileLocation(value.column, value.row))
+        tiles.setWallAt(tiles.getTileLocation(value11.column, value11.row), true)
+        tiles.placeOnTile(Level_Sprite_PlayerChange, tiles.getTileLocation(value11.column, value11.row))
         Level_Sprite_PlayerChange.y += Setting_Game_3248VerticalOffset
-        Level_Sprite_PlayerChange.z = value.y
+        Level_Sprite_PlayerChange.z = value11.y
         sprites.setDataNumber(Level_Sprite_PlayerChange, "InteractIndex", 1)
     }
-}
-function Player_CurrentSpeed () {
-    return Math_Vector2Magnitude(Player_Sprite_MoveController.vx, Player_Sprite_MoveController.vy) / Setting_Player_WalkSpeed
 }
 function dy_Normalized () {
     return NormalizeY(dx_Stabilized(), dy_Stabilized())
@@ -2067,6 +1950,14 @@ function UI_CreateHealth () {
     UI_Sprite_HealthBar.setPosition(26, 8)
     UI_Sprite_HealthBar.z = Setting_UI_InterfaceZ - 10
 }
+function Player_isReadyToWalk () {
+    if (game.runtime() > Player_LastStep + 1000 / (Setting_Player_AnimationWalkSpeed * Player_CurrentSpeed())) {
+        Player_LastStep = game.runtime()
+        return true
+    } else {
+        return false
+    }
+}
 function Player_ShadowVisuals () {
     Sprite_PlaceOnOffset(Player_Sprite_VisualsShadow, Player_Sprite_MoveController, 0, 0)
     Player_ShadowImage()
@@ -2103,6 +1994,9 @@ sprites.onOverlap(SpriteKind.WeaponPickup, SpriteKind.Player, function (sprite, 
     sprites.destroy(sprite)
     Play_Player_PickupWeapon()
 })
+function Player_CurrentSpeed () {
+    return Math_Vector2Magnitude(Player_Sprite_MoveController.vx, Player_Sprite_MoveController.vy) / Setting_Player_WalkSpeed
+}
 function Player_PlayerImage_Walk () {
     if (Player_isReadyToWalk()) {
         if (Player_isFootOut) {
@@ -2158,7 +2052,7 @@ function Enemy_UpdateEnemyCollision () {
     Enemy_UpdateSlimesCollision()
 }
 function Settings_Sound () {
-    Setting_Sound_MusicVolume = 255
+    Setting_Sound_MusicVolume = 200
     Setting_Sound_EffectsVolume = 255
     Setting_Sound_SmallEffectsMultiplier = 0.75
 }
@@ -2184,6 +2078,9 @@ function UI_ShakeButtonB () {
     false
     )
 }
+sprites.onOverlap(SpriteKind.WeaponPickup, SpriteKind.PickupBox, function (sprite, otherSprite) {
+    sprite.follow(Player_Sprite_MoveController, 1 + 500 / Sprites_DistanceBetweenSprites(sprite, otherSprite))
+})
 function LeaveTitlescreen () {
     SetUpProjectVariables()
     Game_FadeFromBlack(500)
@@ -2191,18 +2088,18 @@ function LeaveTitlescreen () {
     Player_InitializePlayer()
 }
 function Level_Teleporter () {
-    for (let value of tiles.getTilesByType(assets.tile`myTile13`)) {
+    for (let value12 of tiles.getTilesByType(assets.tile`myTile13`)) {
         Level_Sprite_Teleporter = sprites.create(assets.image`Teleporter_0`, SpriteKind.Interact)
-        tiles.placeOnTile(Level_Sprite_Teleporter, tiles.getTileLocation(value.column, value.row))
+        tiles.placeOnTile(Level_Sprite_Teleporter, tiles.getTileLocation(value12.column, value12.row))
         Level_Sprite_Teleporter.y += 8
         sprites.setDataNumber(Level_Sprite_Teleporter, "InteractIndex", 3)
         Level_Sprite_Teleporter.setFlag(SpriteFlag.Invisible, true)
         Level_Sprite_Teleporter.setFlag(SpriteFlag.Ghost, true)
         Level_Sprite_TeleporterTop = sprites.create(assets.image`Teleporter_0`, SpriteKind.Dummy)
-        tiles.placeOnTile(Level_Sprite_TeleporterTop, tiles.getTileLocation(value.column, value.row))
+        tiles.placeOnTile(Level_Sprite_TeleporterTop, tiles.getTileLocation(value12.column, value12.row))
         Level_Sprite_TeleporterTop.setFlag(SpriteFlag.Ghost, true)
         Level_Sprite_TeleporterTop = sprites.create(assets.image`Teleporter_1`, SpriteKind.Dummy)
-        tiles.placeOnTile(Level_Sprite_TeleporterTop, tiles.getTileLocation(value.column, value.row))
+        tiles.placeOnTile(Level_Sprite_TeleporterTop, tiles.getTileLocation(value12.column, value12.row))
         Level_Sprite_Teleporter.setFlag(SpriteFlag.Ghost, true)
         Level_Sprite_TeleporterTop.z += 5
         animation.runImageAnimation(
@@ -2235,6 +2132,9 @@ function Game_FadeFromBlack2 (_Time: number) {
         })
     })
 }
+sprites.onOverlap(SpriteKind.Potion, SpriteKind.PickupBox, function (sprite, otherSprite) {
+    sprite.follow(Player_Sprite_MoveController, 1 + 500 / Sprites_DistanceBetweenSprites(sprite, otherSprite))
+})
 function Player_CreateVisuals () {
     if (Game_isTeleporting) {
         Player_CameraOffsetY = 1 * Setting_Player_MovingCameraOffset
@@ -2278,14 +2178,6 @@ function Game_Brightness76 () {
     color.setColor(13, color.rgb(255, 160, 87))
     color.setColor(14, color.rgb(95, 87, 79))
     color.setColor(15, color.rgb(0, 0, 0))
-}
-function Player_isReadyToWalk () {
-    if (game.runtime() > Player_LastStep + 1000 / (Setting_Player_AnimationWalkSpeed * Player_CurrentSpeed())) {
-        Player_LastStep = game.runtime()
-        return true
-    } else {
-        return false
-    }
 }
 function Player_LimitVelocity () {
     Player_Sprite_MoveController.setVelocity(Math.constrain(Player_Sprite_MoveController.vx, -1 * Setting_Player_MaxVelocity, Setting_Player_MaxVelocity), Math.constrain(Player_Sprite_MoveController.vy, -1 * Setting_Player_MaxVelocity, Setting_Player_MaxVelocity))
@@ -2392,24 +2284,24 @@ function Math_Vector2Magnitude (_x: number, _y: number) {
     }
 }
 function Enemy_UpdateSlimesMovement () {
-    for (let value of sprites.allOfKind(SpriteKind.Slime)) {
-        value.z = value.y - Setting_Game_3248VerticalOffset
-        if (game.runtime() > sprites.readDataNumber(value, "lastJump") + Setting_Enemy_SlimeJumpDelay) {
-            sprites.setDataNumber(value, "lastJump", game.runtime())
+    for (let value13 of sprites.allOfKind(SpriteKind.Slime)) {
+        value13.z = value13.y - Setting_Game_3248VerticalOffset
+        if (game.runtime() > sprites.readDataNumber(value13, "lastJump") + Setting_Enemy_SlimeJumpDelay) {
+            sprites.setDataNumber(value13, "lastJump", game.runtime())
             animation.runImageAnimation(
-            value,
+            value13,
             assets.animation`Slime_Jump1`,
             100,
             false
             )
         }
-        sprites.setDataNumber(value, "vertical", Math.max(0, -0.00019 * (game.runtime() - sprites.readDataNumber(value, "lastJump") - 1950) ** 2 + 30))
-        if (sprites.readDataNumber(value, "vertical") > 0) {
-            value.setVelocity(sprites.readDataNumber(value, "MoveX"), sprites.readDataNumber(value, "MoveY"))
+        sprites.setDataNumber(value13, "vertical", Math.max(0, -0.00019 * (game.runtime() - sprites.readDataNumber(value13, "lastJump") - 1950) ** 2 + 30))
+        if (sprites.readDataNumber(value13, "vertical") > 0) {
+            value13.setVelocity(sprites.readDataNumber(value13, "MoveX"), sprites.readDataNumber(value13, "MoveY"))
         } else {
-            value.setVelocity(0, 0)
-            sprites.setDataNumber(value, "MoveX", Setting_Enemy_SlimeJumpMoveSpeed * ((Player_Sprite_MoveController.x - value.x) / Math_Vector2Magnitude(Player_Sprite_MoveController.x - value.x, Player_Sprite_MoveController.y - (value.y - Setting_Game_3248VerticalOffset))))
-            sprites.setDataNumber(value, "MoveY", Setting_Enemy_SlimeJumpMoveSpeed * ((Player_Sprite_MoveController.y - (value.y - Setting_Game_3248VerticalOffset)) / Math_Vector2Magnitude(Player_Sprite_MoveController.x - value.x, Player_Sprite_MoveController.y - (value.y - Setting_Game_3248VerticalOffset))))
+            value13.setVelocity(0, 0)
+            sprites.setDataNumber(value13, "MoveX", Setting_Enemy_SlimeJumpMoveSpeed * ((Player_Sprite_MoveController.x - value13.x) / Math_Vector2Magnitude(Player_Sprite_MoveController.x - value13.x, Player_Sprite_MoveController.y - (value13.y - Setting_Game_3248VerticalOffset))))
+            sprites.setDataNumber(value13, "MoveY", Setting_Enemy_SlimeJumpMoveSpeed * ((Player_Sprite_MoveController.y - (value13.y - Setting_Game_3248VerticalOffset)) / Math_Vector2Magnitude(Player_Sprite_MoveController.x - value13.x, Player_Sprite_MoveController.y - (value13.y - Setting_Game_3248VerticalOffset))))
         }
     }
 }
@@ -2424,6 +2316,12 @@ function Play_Menu_Open () {
     SoundExpressionEffect.None,
     InterpolationCurve.Logarithmic
     ), music.PlaybackMode.InBackground)
+}
+function _3248EnemyCollison (_Enemy1: Sprite, _Enemy2: Sprite, _Amount: number) {
+    _Enemy1.x += _Amount * ((_Enemy1.x - _Enemy2.x) / Math_Vector2Magnitude(_Enemy1.x - _Enemy2.x, _Enemy1.y - _Enemy2.y))
+    _Enemy1.y += _Amount * ((_Enemy1.y - _Enemy2.y) / Math_Vector2Magnitude(_Enemy1.x - _Enemy2.x, _Enemy1.y - _Enemy2.y))
+    _Enemy2.x += _Amount * ((_Enemy2.x - _Enemy1.x) / Math_Vector2Magnitude(_Enemy2.x - _Enemy1.x, _Enemy2.y - _Enemy1.y))
+    _Enemy2.y += _Amount * ((_Enemy2.y - _Enemy1.y) / Math_Vector2Magnitude(_Enemy2.x - _Enemy1.x, _Enemy2.y - _Enemy1.y))
 }
 function Player_CreateMoveController () {
     Player_TargetSpeed = Setting_Player_WalkSpeed
@@ -2551,6 +2449,13 @@ function NormalizeX (_x: number, _y: number) {
         return 0
     }
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Helmet, function (sprite, otherSprite) {
+    if (!(Player_hasHelmet)) {
+        sprites.destroy(otherSprite)
+        Player_hasHelmet = true
+        Play_Player_PickupHelmet()
+    }
+})
 function Game_CreateEffects () {
     Effect_Level_Teleporter = extraEffects.createCustomSpreadEffectData(
     [
@@ -2694,8 +2599,6 @@ let _Volume = 0
 let _Pitch = 0
 let Player_Sprite_PickupBox: Sprite = null
 let Player_isInvulnerable = false
-let Player_LastStep = 0
-let Setting_Player_AnimationWalkSpeed = 0
 let Level_Sprite_TeleporterTop: Sprite = null
 let UI_isButtonBShaking = false
 let UI_LastButtonBShake = 0
@@ -2703,8 +2606,11 @@ let Setting_Sound_MusicVolume = 0
 let Setting_Player_MaxVelocity = 0
 let Setting_Player_RunSpeedMultiplier = 0
 let Setting_Player_VisualJumpMultiplier = 0
+let Setting_Player_AnimationWalkSpeed = 0
+let Player_LastStep = 0
 let UI_Sprite_ShieldIcon: Sprite = null
 let UI_Sprite_HealthFrame: Sprite = null
+let Setting_Player_WalkSpeed = 0
 let Player_isCameraFrozen = false
 let Effect_Enemy_SlimeDeath: SpreadEffectData = null
 let Effect_Enemy_SlimeDamaged: SpreadEffectData = null
@@ -2717,7 +2623,6 @@ let UI_Sprite_ButtonIconB: Sprite = null
 let UI_Sprite_ButtonIconA: Sprite = null
 let UI_isButtonAShaking = false
 let UI_LastButtonAShake = 0
-let Setting_Player_WalkSpeed = 0
 let UI_Sprite_ButtonFrame: Sprite = null
 let Level_Pickup: Sprite = null
 let Player_LastAttacked = 0
@@ -2760,6 +2665,9 @@ let UI_Sprite_GameStart: Sprite = null
 let Game_EnemiesDefeated = 0
 let Player_CurrentWeapon = 0
 let UI_Sprite_HealthBar: StatusBarSprite = null
+let Player_CurrentInteractState = 0
+let UI_Sprite_ButtonA: Sprite = null
+let Control_LastPressedButtonA = 0
 let Setting_Player_AirAccelMultiplier = 0
 let Setting_Player_GroundAcceleration = 0
 let Player_TargetSpeed = 0
@@ -2791,10 +2699,10 @@ let Intro_Logo: Sprite = null
 let Intro_Bird: Sprite = null
 let Intro_Background: Sprite = null
 let mySprite: Sprite = null
-let Player_CurrentInteractState = 0
-let UI_Sprite_ButtonA: Sprite = null
-let Control_LastPressedButtonA = 0
 let Level_Sprite_Ship: Sprite = null
+let UI_Sprite_ButtonB: Sprite = null
+let Control_LastPressedButtonB = 0
+let Player_isLocked = false
 let Setting_Interact_MaxDistance = 0
 let Setting_Player_InvinvibilityFramesLength = 0
 let Setting_Weapon_ReloadWait_Peashooter = 0
@@ -2810,9 +2718,6 @@ let Setting_Weapon_ClipSize_Peashooter = 0
 let UI_Sprite_AmmoBar: StatusBarSprite = null
 let Player_Sprite_VisualsShadow: Sprite = null
 let Player_Sprite_JumpController: Sprite = null
-let UI_Sprite_ButtonB: Sprite = null
-let Control_LastPressedButtonB = 0
-let Player_isLocked = false
 let Setting_Game_3248VerticalOffset = 0
 let Setting_Weapon_BulletLateralOffset = 0
 let Player_Sprite_VisualsPlayer: Sprite = null
@@ -2830,6 +2735,10 @@ let Player_CurrentState = 0
 let Player_Sprite_MoveController: Sprite = null
 let Setting_Sound_EffectsVolume = 0
 let Setting_Game_IsArcadeMode = false
+namespace userconfig {
+    export const ARCADE_SCREEN_WIDTH = 320
+    export const ARCADE_SCREEN_HEIGHT = 240
+}
 Setting_Game_IsArcadeMode = true
 music.stopAllSounds()
 Settings_Sound()
